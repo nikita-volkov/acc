@@ -14,6 +14,11 @@ import qualified Acc.Prelude as Prelude
 data BinTree1 a =
   Leaf !a |
   Branch !(BinTree1 a) !(BinTree1 a)
+  deriving (Generic, Generic1)
+
+instance NFData a => NFData (BinTree1 a)
+
+instance NFData1 BinTree1
 
 deriving instance Functor BinTree1
 

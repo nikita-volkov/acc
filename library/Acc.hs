@@ -25,6 +25,11 @@ ensuring that you won\'t get stack overflow.
 data Acc a =
   EmptyAcc |
   TreeAcc !(BinTree1.BinTree1 a)
+  deriving (Generic, Generic1)
+
+instance NFData a => NFData (Acc a)
+
+instance NFData1 Acc
 
 deriving instance Functor Acc
 

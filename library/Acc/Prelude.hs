@@ -56,7 +56,7 @@ import Foreign.StablePtr as Exports
 import Foreign.Storable as Exports
 import GHC.Conc as Exports hiding (orElse, withMVar, threadWaitWriteSTM, threadWaitWrite, threadWaitReadSTM, threadWaitRead)
 import GHC.Exts as Exports (IsList(..), lazy, inline, sortWith, groupWith)
-import GHC.Generics as Exports (Generic)
+import GHC.Generics as Exports (Generic, Generic1)
 import GHC.IO.Exception as Exports
 import Numeric as Exports
 import Prelude as Exports hiding (fail, concat, foldr, mapM_, sequence_, foldl1, maximum, minimum, product, sum, all, and, any, concatMap, elem, foldl, foldr1, notElem, or, mapM, sequence, id, (.))
@@ -95,3 +95,6 @@ import Data.HashMap.Strict as Exports (HashMap)
 -------------------------
 import Control.Foldl as Exports (Fold(..))
 
+-- deepseq
+-------------------------
+import Control.DeepSeq as Exports
