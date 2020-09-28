@@ -35,12 +35,7 @@ library
     Acc.Prelude
   build-depends:
     base >=4.13 && <5,
-    deepseq >=1.4.4 && <1.5,
-    foldl >=1.4 && <2,
-    hashable >=1 && <2,
-    selective >=0.4 && <0.5,
-    unordered-containers >=0.2.10 && <0.3,
-    vector >=0.12 && <0.13
+    deepseq >=1.4.4 && <1.5
 
 benchmark benchmark
   type: exitcode-stdio-1.0

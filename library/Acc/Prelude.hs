@@ -74,27 +74,6 @@ import Text.Printf as Exports (printf, hPrintf)
 import Text.Read as Exports (Read(..), readMaybe, readEither)
 import Unsafe.Coerce as Exports
 
--- selective
--------------------------
-import Control.Selective as Exports
-
--- vector
--------------------------
-import Data.Vector as Exports (Vector)
-
--- hashable
--------------------------
-import Data.Hashable as Exports (Hashable)
-
--- unordered-containers
--------------------------
-import Data.HashSet as Exports (HashSet)
-import Data.HashMap.Strict as Exports (HashMap)
-
--- foldl
--------------------------
-import Control.Foldl as Exports (Fold(..))
-
 -- deepseq
 -------------------------
 import Control.DeepSeq as Exports
