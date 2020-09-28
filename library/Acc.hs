@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 module Acc
 (
   Acc,
@@ -46,12 +47,14 @@ instance Foldable Acc where
         BinTree1.foldMap f a
       EmptyAcc ->
         mempty
+#if MIN_VERSION_base(4,13,0)
   foldMap' f =
     \ case
       TreeAcc a ->
         BinTree1.foldMap' f a
       EmptyAcc ->
         mempty
+#endif
   foldr step acc =
     \ case
       TreeAcc a ->
