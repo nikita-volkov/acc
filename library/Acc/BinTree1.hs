@@ -40,7 +40,7 @@ instance Foldable BinTree1 where
     foldlDef'
 
 foldM :: Monad m => (a -> b -> m a) -> a -> BinTree1 b -> m a
-foldM step acc =
+foldM step !acc =
   \ case
     Branch a b -> foldMOnBranch step acc a b
     Leaf a -> step acc a
