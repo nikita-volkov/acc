@@ -19,8 +19,14 @@ To produce a multielement 'Acc' use 'fromList'.
 To combine use '<|>' or '<>' and other 'Alternative' and 'Monoid'-related utils.
 To extract elements use 'Foldable' API.
 
-All functions are implemented with tail recursion,
-ensuring that you won\'t get stack overflow.
+The benchmarks show that for the described use-case this data-structure
+is on average 2 times faster than 'Data.DList.DList' and 'Data.Sequence.Seq',
+is on par with list when you always prepend elements and
+is exponentially faster than list when you append.
+
+Internally it is implemented as a simple binary tree
+with all functions optimized to use tail recursion,
+ensuring that you don\'t get stack overflow.
 -}
 data Acc a =
   EmptyAcc |
