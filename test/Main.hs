@@ -24,6 +24,31 @@ main =
         list' =
           toList acc'
         in list === list'
+    ,
+    testProperty "foldl'" $
+      \ (acc :: Acc Int) ->
+        foldl' (flip (:)) [] acc ===
+        foldl' (flip (:)) [] (toList acc)
+    ,
+    testProperty "foldr" $
+      \ (acc :: Acc Int) ->
+        foldr (:) [] acc ===
+        foldr (:) [] (toList acc)
+    ,
+    testProperty "foldr'" $
+      \ (acc :: Acc Int) ->
+        foldr' (:) [] acc ===
+        foldr' (:) [] (toList acc)
+    ,
+    testProperty "foldMap" $
+      \ (acc :: Acc Int) ->
+        foldMap (: []) acc ===
+        foldMap (: []) (toList acc)
+    ,
+    testProperty "foldMap'" $
+      \ (acc :: Acc Int) ->
+        foldMap' (: []) acc ===
+        foldMap' (: []) (toList acc)
     ]
 
 instance Arbitrary a => Arbitrary (Acc a) where
