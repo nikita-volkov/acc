@@ -4,6 +4,11 @@ module Acc.BinTree1
   foldM,
   ap,
   fromList1,
+  foldMapDef,
+  foldMapDef',
+  foldrDef,
+  foldrDef',
+  foldlDef',
 )
 where
 
@@ -59,15 +64,15 @@ foldrOnBranch step acc a b =
     Branch c d -> foldrOnBranch step acc c (Branch d b)
 
 foldrDef' :: (a -> b -> b) -> b -> BinTree1 a -> b
-foldrDef' step acc =
+foldrDef' step !acc =
   \ case
     Branch a b -> foldrOnBranch' step acc a b
     Leaf a -> step a acc
 
 foldrOnBranch' :: (a -> b -> b) -> b -> BinTree1 a -> BinTree1 a -> b
 foldrOnBranch' step acc a b =
-  case a of
-    Leaf c -> step c (foldrDef' step acc b)
+  case b of
+    Leaf c -> foldrDef' step (step c acc) a
     Branch c d -> foldrOnBranch' step acc (Branch a c) d
 
 foldlDef' :: (b -> a -> b) -> b -> BinTree1 a -> b

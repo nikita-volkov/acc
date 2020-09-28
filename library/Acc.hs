@@ -33,7 +33,39 @@ instance NFData1 Acc
 
 deriving instance Functor Acc
 
-deriving instance Foldable Acc
+instance Foldable Acc where
+  foldMap f =
+    \ case
+      TreeAcc a ->
+        foldMap f a
+      EmptyAcc ->
+        mempty
+  foldMap' f =
+    \ case
+      TreeAcc a ->
+        foldMap' f a
+      EmptyAcc ->
+        mempty
+  foldr step acc =
+    \ case
+      TreeAcc a ->
+        foldr step acc a
+      EmptyAcc ->
+        acc
+  foldr' step acc =
+    \ case
+      TreeAcc a ->
+        foldr' step acc a
+      EmptyAcc ->
+        acc
+  foldl' step acc =
+    \ case
+      TreeAcc a ->
+        foldl' step acc a
+      EmptyAcc ->
+        acc
+  sum =
+    foldl' (+) 0
 
 deriving instance Traversable Acc
 

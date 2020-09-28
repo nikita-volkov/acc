@@ -12,9 +12,13 @@ import qualified Data.Vector as Vector
 
 main =
   defaultMain [
-    sumBgroup "foldr',foldl'"
+    sumBgroup "sum/foldr',foldr'"
       (Vector.fromList (replicate 100 (Vector.fromList (replicate @Int 100 1))))
-      (\ singleton -> foldl' (\ a b -> a <> foldr' (mappend . singleton) mempty b) mempty)
+      (\ singleton -> foldr' (\ a b -> foldr' (mappend . singleton) mempty a <> b) mempty)
+    ,
+    sumBgroup "sum/foldl',foldl'"
+      (Vector.fromList (replicate 100 (Vector.fromList (replicate @Int 100 1))))
+      (\ singleton -> foldl' (\ a b -> a <> foldl' (\ a -> mappend a . singleton) mempty b) mempty)
     ,
     bgroup "thousand-elements" [
       bgroup "foldl'" $ let
