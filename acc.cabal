@@ -7,7 +7,7 @@ description:
   Useful for implementing all kinds of builders on top.
   .
   The benchmarks show that for the described use-case it
-  is on average 2 times faster than 'Data.DList.DList' and 'Data.Sequence.Seq',
+  is on average 2 times faster than 'DList' and 'Seq',
   is on par with list when you always prepend elements and
   is exponentially faster than list when you append.
 homepage: https://github.com/nikita-volkov/acc
