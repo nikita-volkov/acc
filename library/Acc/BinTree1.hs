@@ -29,6 +29,8 @@ instance Foldable BinTree1 where
     foldMapDef'
   foldr =
     foldrDef
+  foldr' =
+    foldrDef'
   foldl' =
     foldlDef'
 
@@ -55,6 +57,18 @@ foldrOnBranch step acc a b =
   case a of
     Leaf c -> step c (foldrDef step acc b)
     Branch c d -> foldrOnBranch step acc c (Branch d b)
+
+foldrDef' :: (a -> b -> b) -> b -> BinTree1 a -> b
+foldrDef' step acc =
+  \ case
+    Branch a b -> foldrOnBranch' step acc a b
+    Leaf a -> step a acc
+
+foldrOnBranch' :: (a -> b -> b) -> b -> BinTree1 a -> BinTree1 a -> b
+foldrOnBranch' step acc a b =
+  case a of
+    Leaf c -> step c (foldrDef' step acc b)
+    Branch c d -> foldrOnBranch' step acc (Branch a c) d
 
 foldlDef' :: (b -> a -> b) -> b -> BinTree1 a -> b
 foldlDef' step !acc =
