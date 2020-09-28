@@ -132,5 +132,11 @@ ap =
 fromList1 :: a -> [a] -> BinTree1 a
 fromList1 a =
   \ case
-    b : c -> Branch (Leaf a) (fromList1 b c)
+    b : c -> fromList1WithAcc (Leaf a) b c
+    _ -> Leaf a
+
+fromList1WithAcc :: BinTree1 a -> a -> [a] -> BinTree1 a
+fromList1WithAcc leftTree a =
+  \ case
+    b : c -> fromList1WithAcc (Branch leftTree (Leaf a)) b c
     _ -> Leaf a
