@@ -12,6 +12,14 @@ import qualified Data.Vector as Vector
 
 main =
   defaultMain [
+    sumBgroup "1"
+      (replicate 1000 1)
+      (foldMapToRight)
+    ,
+    sumBgroup "2"
+      (replicate 1000 1)
+      (foldMapToLeft)
+    ,
     sumBgroup "sum/foldr',foldr'"
       (Vector.fromList (replicate 100 (Vector.fromList (replicate @Int 100 1))))
       (\ singleton -> foldr' (\ a b -> foldr' (mappend . singleton) mempty a <> b) mempty)
@@ -235,7 +243,7 @@ main =
     ]
 
 sumBgroup :: NFData input => String -> input -> (forall f. (Foldable f, Monoid (f Int)) => (Int -> f Int) -> input -> f Int) -> Benchmark
-sumBgroup name (force -> !input) work =
+sumBgroup name (force -> !input) build =
   bgroup name [
     sumBench "Acc" (pure @Acc.Acc)
     ,
@@ -248,4 +256,18 @@ sumBgroup name (force -> !input) work =
   where
     sumBench :: (Foldable f, Monoid (f Int)) => String -> (Int -> f Int) -> Benchmark
     sumBench name singleton =
-      bench name (nf (Foldable.sum . work singleton) input)
+      bench name (nf (Foldable.sum . build singleton) input)
+
+
+
+{-| Best for Acc. -}
+{-# NOINLINE foldMapToRight #-}
+foldMapToRight :: Monoid m => (a -> m) -> [a] -> m
+foldMapToRight pure =
+  foldl' (\ a b -> pure b <> a) mempty
+
+{-| Worst for Acc. -}
+{-# NOINLINE foldMapToLeft #-}
+foldMapToLeft :: Monoid m => (a -> m) -> [a] -> m
+foldMapToLeft pure =
+  foldl' (\ a b -> a <> pure b) mempty

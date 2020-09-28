@@ -114,6 +114,6 @@ instance IsList (Acc a) where
   toList =
     \ case
       TreeAcc a ->
-        Foldable.toList a
+        foldr (:) [] a
       _ ->
         []
