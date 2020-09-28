@@ -10,6 +10,10 @@ module Acc.BinTree1
   foldr',
   foldl',
   traverse,
+  uncons,
+  unconsTo,
+  unsnoc,
+  unsnocTo,
 )
 where
 
@@ -152,3 +156,35 @@ fromList1To leftTree a =
   \ case
     b : c -> fromList1To (Branch leftTree (Leaf a)) b c
     _ -> Branch leftTree (Leaf a)
+
+uncons :: BinTree1 a -> (a, Maybe (BinTree1 a))
+uncons =
+  \ case
+    Branch l r ->
+      fmap Just (unconsTo r l)
+    Leaf a ->
+      (a, Nothing)
+
+unconsTo :: BinTree1 a -> BinTree1 a -> (a, BinTree1 a)
+unconsTo buff =
+  \ case
+    Branch l r ->
+      unconsTo (Branch r buff) l
+    Leaf a ->
+      (a, buff)
+
+unsnoc :: BinTree1 a -> (a, Maybe (BinTree1 a))
+unsnoc =
+  \ case
+    Branch l r ->
+      fmap Just (unsnocTo l r)
+    Leaf a ->
+      (a, Nothing)
+
+unsnocTo :: BinTree1 a -> BinTree1 a -> (a, BinTree1 a)
+unsnocTo buff =
+  \ case
+    Branch l r ->
+      unsnocTo (Branch l buff) r
+    Leaf a ->
+      (a, buff)

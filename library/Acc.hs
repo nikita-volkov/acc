@@ -2,6 +2,10 @@
 module Acc
 (
   Acc,
+  cons,
+  snoc,
+  uncons,
+  unsnoc,
 )
 where
 
@@ -138,3 +142,69 @@ instance IsList (Acc a) where
 instance Show a => Show (Acc a) where
   show =
     show . toList
+
+{-|
+Prepend an element.
+-}
+cons :: a -> Acc a -> Acc a
+cons a =
+  \ case
+    TreeAcc tree ->
+      TreeAcc (BinTree1.Branch (BinTree1.Leaf a) tree)
+    EmptyAcc ->
+      TreeAcc (BinTree1.Leaf a)
+
+{-|
+Extract the first element.
+
+The produced accumulator will lack the extracted element
+and will have the underlying tree rebalanced towards the beginning.
+This means that calling 'uncons' on it will be \(\mathcal{O}(1)\) and
+'unsnoc' will be \(\mathcal{O}(n)\).
+-}
+uncons :: Acc a -> Maybe (a, Acc a)
+uncons =
+  \ case
+    TreeAcc tree ->
+      case tree of
+        BinTree1.Branch l r ->
+          case BinTree1.unconsTo r l of
+            (res, newTree) ->
+              Just (res, TreeAcc newTree)
+        BinTree1.Leaf res ->
+          Just (res, EmptyAcc)
+    EmptyAcc ->
+      Nothing
+
+{-|
+Append an element.
+-}
+snoc :: a -> Acc a -> Acc a
+snoc a =
+  \ case
+    TreeAcc tree ->
+      TreeAcc (BinTree1.Branch tree (BinTree1.Leaf a))
+    EmptyAcc ->
+      TreeAcc (BinTree1.Leaf a)
+
+{-|
+Extract the last element.
+
+The produced accumulator will lack the extracted element
+and will have the underlying tree rebalanced towards the end.
+This means that calling 'unsnoc' on it will be \(\mathcal{O}(1)\) and
+'uncons' will be \(\mathcal{O}(n)\).
+-}
+unsnoc :: Acc a -> Maybe (a, Acc a)
+unsnoc =
+  \ case
+    TreeAcc tree ->
+      case tree of
+        BinTree1.Branch l r ->
+          case BinTree1.unsnocTo l r of
+            (res, newTree) ->
+              Just (res, TreeAcc newTree)
+        BinTree1.Leaf res ->
+          Just (res, EmptyAcc)
+    EmptyAcc ->
+      Nothing
