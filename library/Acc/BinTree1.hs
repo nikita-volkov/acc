@@ -4,15 +4,16 @@ module Acc.BinTree1
   foldM,
   ap,
   fromList1,
-  foldMapDef,
-  foldMapDef',
-  foldrDef,
-  foldrDef',
-  foldlDef',
+  foldMap,
+  foldMap',
+  foldr,
+  foldr',
+  foldl',
+  traverse,
 )
 where
 
-import Acc.Prelude hiding (foldM, ap)
+import Acc.Prelude hiding (ap, foldM, foldl', foldr, foldr', foldMap, foldMap', traverse)
 import qualified Acc.Prelude as Prelude
 
 
@@ -27,18 +28,6 @@ instance NFData1 BinTree1
 
 deriving instance Functor BinTree1
 
-instance Foldable BinTree1 where
-  foldMap =
-    foldMapDef
-  foldMap' =
-    foldMapDef'
-  foldr =
-    foldrDef
-  foldr' =
-    foldrDef'
-  foldl' =
-    foldlDef'
-
 foldM :: Monad m => (a -> b -> m a) -> a -> BinTree1 b -> m a
 foldM step !acc =
   \ case
@@ -51,8 +40,8 @@ foldMOnBranch step acc a b =
     Leaf c -> step acc c >>= \ acc' -> foldM step acc' b
     Branch c d -> foldMOnBranch step acc c (Branch d b)
 
-foldrDef :: (a -> b -> b) -> b -> BinTree1 a -> b
-foldrDef step acc =
+foldr :: (a -> b -> b) -> b -> BinTree1 a -> b
+foldr step acc =
   \ case
     Branch a b ->
       foldrOnBranch step acc a b
@@ -63,12 +52,12 @@ foldrOnBranch :: (a -> b -> b) -> b -> BinTree1 a -> BinTree1 a -> b
 foldrOnBranch step acc a b =
   case a of
     Leaf c ->
-      step c (foldrDef step acc b)
+      step c (foldr step acc b)
     Branch c d ->
       foldrOnBranch step acc c (Branch d b)
 
-foldrDef' :: (a -> b -> b) -> b -> BinTree1 a -> b
-foldrDef' step !acc =
+foldr' :: (a -> b -> b) -> b -> BinTree1 a -> b
+foldr' step !acc =
   \ case
     Branch a b -> foldrOnBranch' step acc a b
     Leaf a -> step a acc
@@ -76,11 +65,11 @@ foldrDef' step !acc =
 foldrOnBranch' :: (a -> b -> b) -> b -> BinTree1 a -> BinTree1 a -> b
 foldrOnBranch' step acc a b =
   case b of
-    Leaf c -> foldrDef' step (step c acc) a
+    Leaf c -> foldr' step (step c acc) a
     Branch c d -> foldrOnBranch' step acc (Branch a c) d
 
-foldlDef' :: (b -> a -> b) -> b -> BinTree1 a -> b
-foldlDef' step !acc =
+foldl' :: (b -> a -> b) -> b -> BinTree1 a -> b
+foldl' step !acc =
   \ case
     Branch a b ->
       foldlOnBranch' step acc a b
@@ -91,49 +80,49 @@ foldlOnBranch' :: (b -> a -> b) -> b -> BinTree1 a -> BinTree1 a -> b
 foldlOnBranch' step acc a b =
   case a of
     Leaf c ->
-      foldlDef' step (step acc c) b
+      foldl' step (step acc c) b
     Branch c d ->
       foldlOnBranch' step acc c (Branch d b)
 
-foldMapDef :: Monoid m => (a -> m) -> BinTree1 a -> m
-foldMapDef =
-  foldMapWithAcc mempty
+foldMap :: Monoid m => (a -> m) -> BinTree1 a -> m
+foldMap =
+  foldMapTo mempty
 
-foldMapWithAcc :: Monoid m => m -> (a -> m) -> BinTree1 a -> m
-foldMapWithAcc acc map =
+foldMapTo :: Monoid m => m -> (a -> m) -> BinTree1 a -> m
+foldMapTo acc map =
   \ case
-    Branch a b -> foldMapOnBranch acc map a b
+    Branch a b -> foldMapToOnBranch acc map a b
     Leaf a -> acc <> map a
 
-foldMapOnBranch :: Monoid m => m -> (a -> m) -> BinTree1 a -> BinTree1 a -> m
-foldMapOnBranch acc map a b =
+foldMapToOnBranch :: Monoid m => m -> (a -> m) -> BinTree1 a -> BinTree1 a -> m
+foldMapToOnBranch acc map a b =
   case a of
-    Leaf c -> foldMapWithAcc (acc <> map c) map b
-    Branch c d -> foldMapOnBranch acc map c (Branch d b)
+    Leaf c -> foldMapTo (acc <> map c) map b
+    Branch c d -> foldMapToOnBranch acc map c (Branch d b)
 
-foldMapDef' :: Monoid m => (a -> m) -> BinTree1 a -> m
-foldMapDef' =
-  foldMapWithAcc' mempty
+foldMap' :: Monoid m => (a -> m) -> BinTree1 a -> m
+foldMap' =
+  foldMapTo' mempty
 
-foldMapWithAcc' :: Monoid m => m -> (a -> m) -> BinTree1 a -> m
-foldMapWithAcc' !acc map =
+foldMapTo' :: Monoid m => m -> (a -> m) -> BinTree1 a -> m
+foldMapTo' !acc map =
   \ case
-    Branch a b -> foldMapOnBranch' acc map a b
+    Branch a b -> foldMapToOnBranch' acc map a b
     Leaf a -> acc <> map a
 
-foldMapOnBranch' :: Monoid m => m -> (a -> m) -> BinTree1 a -> BinTree1 a -> m
-foldMapOnBranch' acc map a b =
+foldMapToOnBranch' :: Monoid m => m -> (a -> m) -> BinTree1 a -> BinTree1 a -> m
+foldMapToOnBranch' acc map a b =
   case a of
-    Leaf c -> foldMapWithAcc' (acc <> map c) map b
-    Branch c d -> foldMapOnBranch' acc map c (Branch d b)
+    Leaf c -> foldMapTo' (acc <> map c) map b
+    Branch c d -> foldMapToOnBranch' acc map c (Branch d b)
 
-instance Traversable BinTree1 where
-  traverse map =
-    \ case
-      Branch a b ->
-        traverseOnBranch map a b
-      Leaf a ->
-        Leaf <$> map a
+traverse :: Applicative f => (a -> f b) -> BinTree1 a -> f (BinTree1 b)
+traverse map =
+  \ case
+    Branch a b ->
+      traverseOnBranch map a b
+    Leaf a ->
+      Leaf <$> map a
 
 traverseOnBranch :: Applicative f => (a -> f b) -> BinTree1 a -> BinTree1 a -> f (BinTree1 b)
 traverseOnBranch map a b =
@@ -155,11 +144,11 @@ ap =
 fromList1 :: a -> [a] -> BinTree1 a
 fromList1 a =
   \ case
-    b : c -> fromList1WithAcc (Leaf a) b c
+    b : c -> fromList1To (Leaf a) b c
     _ -> Leaf a
 
-fromList1WithAcc :: BinTree1 a -> a -> [a] -> BinTree1 a
-fromList1WithAcc leftTree a =
+fromList1To :: BinTree1 a -> a -> [a] -> BinTree1 a
+fromList1To leftTree a =
   \ case
-    b : c -> fromList1WithAcc (Branch leftTree (Leaf a)) b c
+    b : c -> fromList1To (Branch leftTree (Leaf a)) b c
     _ -> Branch leftTree (Leaf a)
