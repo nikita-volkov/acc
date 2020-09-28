@@ -34,7 +34,7 @@ library
     Acc.BinTree1
     Acc.Prelude
   build-depends:
-    base >=4.13 && <5,
+    base >=4.11 && <5,
     deepseq >=1.4.4 && <1.5
 
 benchmark benchmark
