@@ -119,6 +119,8 @@ instance Semigroup (Acc a) where
 instance Monoid (Acc a) where
   mempty =
     empty
+  mappend =
+    (<>)
 
 instance IsList (Acc a) where
   type Item (Acc a) = a
