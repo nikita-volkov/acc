@@ -19,7 +19,7 @@ import qualified Acc.Prelude as Prelude
 data BinTree1 a =
   Leaf !a |
   Branch !(BinTree1 a) !(BinTree1 a)
-  deriving (Generic, Generic1)
+  deriving (Generic, Generic1, Show)
 
 instance NFData a => NFData (BinTree1 a)
 
@@ -54,14 +54,18 @@ foldMOnBranch step acc a b =
 foldrDef :: (a -> b -> b) -> b -> BinTree1 a -> b
 foldrDef step acc =
   \ case
-    Branch a b -> foldrOnBranch step acc a b
-    Leaf a -> step a acc
+    Branch a b ->
+      foldrOnBranch step acc a b
+    Leaf a ->
+      step a acc
 
 foldrOnBranch :: (a -> b -> b) -> b -> BinTree1 a -> BinTree1 a -> b
 foldrOnBranch step acc a b =
   case a of
-    Leaf c -> step c (foldrDef step acc b)
-    Branch c d -> foldrOnBranch step acc c (Branch d b)
+    Leaf c ->
+      step c (foldrDef step acc b)
+    Branch c d ->
+      foldrOnBranch step acc c (Branch d b)
 
 foldrDef' :: (a -> b -> b) -> b -> BinTree1 a -> b
 foldrDef' step !acc =
@@ -158,4 +162,4 @@ fromList1WithAcc :: BinTree1 a -> a -> [a] -> BinTree1 a
 fromList1WithAcc leftTree a =
   \ case
     b : c -> fromList1WithAcc (Branch leftTree (Leaf a)) b c
-    _ -> Leaf a
+    _ -> Branch leftTree (Leaf a)

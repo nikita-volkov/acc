@@ -123,3 +123,7 @@ instance IsList (Acc a) where
         foldr (:) [] a
       _ ->
         []
+
+instance Show a => Show (Acc a) where
+  show =
+    show . toList
