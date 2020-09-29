@@ -8,6 +8,7 @@ module Acc.BinTree1
   foldMap',
   foldr,
   foldr',
+  foldl,
   foldl',
   traverse,
   uncons,
@@ -17,7 +18,7 @@ module Acc.BinTree1
 )
 where
 
-import Acc.Prelude hiding (ap, foldM, foldl', foldr, foldr', foldMap, foldMap', traverse)
+import Acc.Prelude hiding (ap, foldM, foldl, foldl', foldr, foldr', foldMap, foldMap', traverse)
 import qualified Acc.Prelude as Prelude
 
 
@@ -71,6 +72,22 @@ foldrOnBranch' step acc a b =
   case b of
     Leaf c -> foldr' step (step c acc) a
     Branch c d -> foldrOnBranch' step acc (Branch a c) d
+
+foldl :: (b -> a -> b) -> b -> BinTree1 a -> b
+foldl step acc =
+  \ case
+    Branch a b ->
+      foldlOnBranch step acc a b
+    Leaf a ->
+      step acc a
+
+foldlOnBranch :: (b -> a -> b) -> b -> BinTree1 a -> BinTree1 a -> b
+foldlOnBranch step acc a b =
+  case b of
+    Leaf c ->
+      step (foldl step acc a) c
+    Branch c d ->
+      foldlOnBranch step acc (Branch a c) d
 
 foldl' :: (b -> a -> b) -> b -> BinTree1 a -> b
 foldl' step !acc =

@@ -25,6 +25,11 @@ main =
           toList acc'
         in list === list'
     ,
+    testProperty "foldl" $
+      \ (acc :: Acc Int) ->
+        foldl (flip (:)) [] acc ===
+        foldl (flip (:)) [] (toList acc)
+    ,
     testProperty "foldl'" $
       \ (acc :: Acc Int) ->
         foldl' (flip (:)) [] acc ===

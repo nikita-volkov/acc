@@ -71,6 +71,12 @@ instance Foldable Acc where
         BinTree1.foldr' step acc a
       EmptyAcc ->
         acc
+  foldl step acc =
+    \ case
+      TreeAcc a ->
+        BinTree1.foldl step acc a
+      EmptyAcc ->
+        acc
   foldl' step acc =
     \ case
       TreeAcc a ->
