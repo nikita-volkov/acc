@@ -9,6 +9,7 @@ import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
 import Acc
 import qualified Test.QuickCheck as QuickCheck
+import qualified Data.List.NonEmpty as NonEmpty
 
 
 main =
@@ -54,6 +55,11 @@ main =
       \ (acc :: Acc Int) ->
         foldMap' (: []) acc ===
         foldMap' (: []) (toList acc)
+    ,
+    testProperty "toNonEmpty" $
+      \ (acc :: Acc Int) ->
+        Acc.toNonEmpty acc ===
+        NonEmpty.nonEmpty (toList acc)
     ]
 
 instance Arbitrary a => Arbitrary (Acc a) where

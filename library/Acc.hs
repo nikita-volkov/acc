@@ -6,6 +6,7 @@ module Acc
   snoc,
   uncons,
   unsnoc,
+  toNonEmpty,
 )
 where
 
@@ -212,5 +213,16 @@ unsnoc =
               Just (res, TreeAcc newTree)
         BinTree1.Leaf res ->
           Just (res, EmptyAcc)
+    EmptyAcc ->
+      Nothing
+
+{-|
+Convert to non empty list if it's not empty.
+-}
+toNonEmpty :: Acc a -> Maybe (NonEmpty a)
+toNonEmpty =
+  \ case
+    TreeAcc tree ->
+      Just (BinTree1.toNonEmpty tree)
     EmptyAcc ->
       Nothing

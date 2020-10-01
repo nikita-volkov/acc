@@ -15,6 +15,7 @@ module Acc.BinTree1
   unconsTo,
   unsnoc,
   unsnocTo,
+  toNonEmpty,
 )
 where
 
@@ -205,3 +206,20 @@ unsnocTo buff =
       unsnocTo (Branch l buff) r
     Leaf a ->
       (a, buff)
+
+toNonEmpty :: BinTree1 a -> NonEmpty a
+toNonEmpty =
+  findFirst
+  where
+    findFirst =
+      \ case
+        Branch l r ->
+          findFirstOnBranch l r
+        Leaf a ->
+          a :| []
+    findFirstOnBranch l r =
+      case l of
+        Branch ll lr ->
+          findFirstOnBranch ll (Branch lr r)
+        Leaf a ->
+          a :| foldr (:) [] r
