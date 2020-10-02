@@ -51,39 +51,39 @@ instance Foldable Acc where
   foldMap f =
     \ case
       TreeAcc a ->
-        BinTree1.foldMap f a
+        foldMap f a
       EmptyAcc ->
         mempty
 #if MIN_VERSION_base(4,13,0)
   foldMap' f =
     \ case
       TreeAcc a ->
-        BinTree1.foldMap' f a
+        foldMap' f a
       EmptyAcc ->
         mempty
 #endif
   foldr step acc =
     \ case
       TreeAcc a ->
-        BinTree1.foldr step acc a
+        foldr step acc a
       EmptyAcc ->
         acc
   foldr' step acc =
     \ case
       TreeAcc a ->
-        BinTree1.foldr' step acc a
+        foldr' step acc a
       EmptyAcc ->
         acc
   foldl step acc =
     \ case
       TreeAcc a ->
-        BinTree1.foldl step acc a
+        foldl step acc a
       EmptyAcc ->
         acc
   foldl' step acc =
     \ case
       TreeAcc a ->
-        BinTree1.foldl' step acc a
+        foldl' step acc a
       EmptyAcc ->
         acc
   sum =
@@ -93,7 +93,7 @@ instance Traversable Acc where
   traverse f =
     \ case
       TreeAcc a ->
-        TreeAcc <$> BinTree1.traverse f a
+        TreeAcc <$> traverse f a
       EmptyAcc ->
         pure EmptyAcc
 
@@ -105,7 +105,7 @@ instance Applicative Acc where
       TreeAcc a ->
         \ case
           TreeAcc b ->
-            TreeAcc (BinTree1.ap a b)
+            TreeAcc (a <*> b)
           EmptyAcc ->
             EmptyAcc
       EmptyAcc ->
@@ -144,7 +144,7 @@ instance IsList (Acc a) where
   toList =
     \ case
       TreeAcc a ->
-        BinTree1.foldr (:) [] a
+        foldr (:) [] a
       _ ->
         []
 
