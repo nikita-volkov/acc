@@ -10,9 +10,10 @@ module Acc
 )
 where
 
-import Acc.Prelude
+import Acc.Prelude hiding (toNonEmpty)
 import qualified Acc.BinTree1 as BinTree1
 import qualified Data.Foldable as Foldable
+import qualified Data.Semigroup.Foldable as Foldable1
 
 
 {-|
@@ -225,6 +226,6 @@ toNonEmpty :: Acc a -> Maybe (NonEmpty a)
 toNonEmpty =
   \ case
     TreeAcc tree ->
-      Just (BinTree1.toNonEmpty tree)
+      Just (Foldable1.toNonEmpty tree)
     EmptyAcc ->
       Nothing

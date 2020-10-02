@@ -8,7 +8,6 @@ module Acc.BinTree1
   unconsTo,
   unsnoc,
   unsnocTo,
-  toNonEmpty,
 )
 where
 
@@ -150,6 +149,68 @@ instance Traversable BinTree1 where
           Branch c d ->
             traverseOnBranch map a (Branch d b)
 
+instance Foldable1 BinTree1 where
+
+  fold1 :: Semigroup m => BinTree1 m -> m
+  fold1 =
+    \ case
+      Branch l r ->
+        rebalancingLeft l r (foldl' (<>))
+      Leaf a ->
+        a
+
+  foldMap1 :: Semigroup m => (a -> m) -> BinTree1 a -> m
+  foldMap1 f =
+    \ case
+      Branch l r ->
+        rebalancingLeft l r (foldl' (\ m a -> m <> f a) . f)
+      Leaf a ->
+        f a
+
+  toNonEmpty :: BinTree1 a -> NonEmpty a
+  toNonEmpty =
+    findFirst
+    where
+      findFirst =
+        \ case
+          Branch l r ->
+            findFirstOnBranch l r
+          Leaf a ->
+            a :| []
+      findFirstOnBranch l r =
+        case l of
+          Branch ll lr ->
+            findFirstOnBranch ll (Branch lr r)
+          Leaf a ->
+            a :| foldr (:) [] r
+
+instance Traversable1 BinTree1 where
+
+  traverse1 map =
+    \ case
+      Branch a b ->
+        traverseOnBranch map a b
+      Leaf a ->
+        Leaf <$> map a
+    where
+      traverseOnBranch map a b =
+        case a of
+          Leaf c ->
+            Branch <$> Leaf <$> map c <.> traverse1 map b
+          Branch c d ->
+            traverseOnBranch map a (Branch d b)
+
+instance Alt BinTree1 where
+  (<!>) =
+    Branch
+
+rebalancingLeft :: BinTree1 a -> BinTree1 a -> (a -> BinTree1 a -> b) -> b
+rebalancingLeft l r cont =
+  case l of
+    Branch ll lr ->
+      rebalancingLeft ll (Branch lr r) cont
+    Leaf a ->
+      cont a r
 
 foldM :: Monad m => (a -> b -> m a) -> a -> BinTree1 b -> m a
 foldM step !acc =
@@ -206,20 +267,3 @@ unsnocTo buff =
       unsnocTo (Branch l buff) r
     Leaf a ->
       (a, buff)
-
-toNonEmpty :: BinTree1 a -> NonEmpty a
-toNonEmpty =
-  findFirst
-  where
-    findFirst =
-      \ case
-        Branch l r ->
-          findFirstOnBranch l r
-        Leaf a ->
-          a :| []
-    findFirstOnBranch l r =
-      case l of
-        Branch ll lr ->
-          findFirstOnBranch ll (Branch lr r)
-        Leaf a ->
-          a :| foldr (:) [] r

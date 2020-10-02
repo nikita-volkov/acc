@@ -77,3 +77,10 @@ import Unsafe.Coerce as Exports
 -- deepseq
 -------------------------
 import Control.DeepSeq as Exports
+
+-- semigroupoids
+-------------------------
+import Data.Functor.Alt as Exports hiding (some, many, optional)
+import Data.Functor.Apply as Exports
+import Data.Semigroup.Foldable as Exports
+import Data.Semigroup.Traversable as Exports
