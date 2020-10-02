@@ -20,6 +20,8 @@ Data structure intended for accumulating a sequence of elements
 for later traversal or folding.
 Useful for implementing all kinds of builders on top.
 
+Appending and prepending is always \(\mathcal{O}(1)\).
+
 To produce a single element 'Acc' use 'pure'.
 To produce a multielement 'Acc' use 'fromList'.
 To combine use '<|>' or '<>' and other 'Alternative' and 'Monoid'-related utils.
