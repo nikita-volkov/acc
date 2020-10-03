@@ -6,7 +6,7 @@ module Acc.NeAcc
 where
 
 import Acc.Prelude
-import qualified Acc.BinTree1 as BinTree1
+import qualified Acc.BinTree as BinTree
 
 
 {-|
@@ -15,7 +15,7 @@ Non-empty accumulator.
 Relates to 'Acc.Acc' the same way as 'NonEmpty' to list.
 -}
 newtype NeAcc a =
-  NeAcc (BinTree1.BinTree1 a)
+  NeAcc (BinTree.BinTree a)
   deriving (Generic, Generic1)
 
 instance Show a => Show (NeAcc a) where
@@ -30,7 +30,7 @@ instance IsList (NeAcc a) where
   type Item (NeAcc a) = a
   fromList =
     \ case
-      a : b -> NeAcc (BinTree1.fromList1 a b)
+      a : b -> NeAcc (BinTree.fromList1 a b)
       _ -> error "Acc.NeAcc.fromList empty input list"
   toList =
     foldr (:) []

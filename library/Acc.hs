@@ -11,7 +11,7 @@ module Acc
 where
 
 import Acc.Prelude hiding (toNonEmpty)
-import qualified Acc.BinTree1 as BinTree1
+import qualified Acc.BinTree as BinTree
 import qualified Data.Foldable as Foldable
 import qualified Data.Semigroup.Foldable as Foldable1
 
@@ -39,7 +39,7 @@ ensuring that you don\'t get stack overflow.
 -}
 data Acc a =
   EmptyAcc |
-  TreeAcc !(BinTree1.BinTree1 a)
+  TreeAcc !(BinTree.BinTree a)
   deriving (Generic, Generic1)
 
 instance NFData a => NFData (Acc a)
@@ -100,7 +100,7 @@ instance Traversable Acc where
 
 instance Applicative Acc where
   pure =
-    TreeAcc . BinTree1.Leaf
+    TreeAcc . BinTree.Leaf
   (<*>) =
     \ case
       TreeAcc a ->
@@ -120,7 +120,7 @@ instance Alternative Acc where
       TreeAcc a ->
         \ case
           TreeAcc b ->
-            TreeAcc (BinTree1.Branch a b)
+            TreeAcc (BinTree.Branch a b)
           EmptyAcc ->
             TreeAcc a
       EmptyAcc ->
@@ -140,7 +140,7 @@ instance IsList (Acc a) where
   type Item (Acc a) = a
   fromList =
     \ case
-      a : b -> TreeAcc (BinTree1.fromList1 a b)
+      a : b -> TreeAcc (BinTree.fromList1 a b)
       _ -> EmptyAcc
   toList =
     \ case
@@ -160,9 +160,9 @@ cons :: a -> Acc a -> Acc a
 cons a =
   \ case
     TreeAcc tree ->
-      TreeAcc (BinTree1.Branch (BinTree1.Leaf a) tree)
+      TreeAcc (BinTree.Branch (BinTree.Leaf a) tree)
     EmptyAcc ->
-      TreeAcc (BinTree1.Leaf a)
+      TreeAcc (BinTree.Leaf a)
 
 {-|
 Extract the first element.
@@ -177,11 +177,11 @@ uncons =
   \ case
     TreeAcc tree ->
       case tree of
-        BinTree1.Branch l r ->
-          case BinTree1.unconsTo r l of
+        BinTree.Branch l r ->
+          case BinTree.unconsTo r l of
             (res, newTree) ->
               Just (res, TreeAcc newTree)
-        BinTree1.Leaf res ->
+        BinTree.Leaf res ->
           Just (res, EmptyAcc)
     EmptyAcc ->
       Nothing
@@ -193,9 +193,9 @@ snoc :: a -> Acc a -> Acc a
 snoc a =
   \ case
     TreeAcc tree ->
-      TreeAcc (BinTree1.Branch tree (BinTree1.Leaf a))
+      TreeAcc (BinTree.Branch tree (BinTree.Leaf a))
     EmptyAcc ->
-      TreeAcc (BinTree1.Leaf a)
+      TreeAcc (BinTree.Leaf a)
 
 {-|
 Extract the last element.
@@ -210,11 +210,11 @@ unsnoc =
   \ case
     TreeAcc tree ->
       case tree of
-        BinTree1.Branch l r ->
-          case BinTree1.unsnocTo l r of
+        BinTree.Branch l r ->
+          case BinTree.unsnocTo l r of
             (res, newTree) ->
               Just (res, TreeAcc newTree)
-        BinTree1.Leaf res ->
+        BinTree.Leaf res ->
           Just (res, EmptyAcc)
     EmptyAcc ->
       Nothing
