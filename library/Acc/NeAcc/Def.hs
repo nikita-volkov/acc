@@ -1,7 +1,7 @@
 {-# LANGUAGE CPP #-}
-module Acc.BinTree
+module Acc.NeAcc.Def
 (
-  BinTree(..),
+  NeAcc(..),
   foldM,
   fromList1,
   uncons,
@@ -16,18 +16,36 @@ import Acc.Prelude hiding (foldM)
 import qualified Acc.Prelude as Prelude
 
 
-data BinTree a =
+{-|
+Non-empty accumulator.
+
+Relates to 'Acc.Acc' the same way as 'NonEmpty' to list.
+-}
+data NeAcc a =
   Leaf !a |
-  Branch !(BinTree a) !(BinTree a)
-  deriving (Generic, Generic1, Show)
+  Branch !(NeAcc a) !(NeAcc a)
+  deriving (Generic, Generic1)
 
-instance NFData a => NFData (BinTree a)
+instance Show a => Show (NeAcc a) where
+  show =
+    show . toList
 
-instance NFData1 BinTree
+instance NFData a => NFData (NeAcc a)
 
-deriving instance Functor BinTree
+instance NFData1 NeAcc
 
-instance Applicative BinTree where
+instance IsList (NeAcc a) where
+  type Item (NeAcc a) = a
+  fromList =
+    \ case
+      a : b -> fromList1 a b
+      _ -> error "Empty input list"
+  toList =
+    foldr (:) []
+
+deriving instance Functor NeAcc
+
+instance Applicative NeAcc where
   pure =
     Leaf
   (<*>) =
@@ -38,9 +56,9 @@ instance Applicative BinTree where
       Leaf a ->
         fmap a 
 
-instance Foldable BinTree where
+instance Foldable NeAcc where
   
-  foldr :: (a -> b -> b) -> b -> BinTree a -> b
+  foldr :: (a -> b -> b) -> b -> NeAcc a -> b
   foldr step acc =
     peel []
     where
@@ -57,7 +75,7 @@ instance Foldable BinTree where
           _ ->
             acc
 
-  foldr' :: (a -> b -> b) -> b -> BinTree a -> b
+  foldr' :: (a -> b -> b) -> b -> NeAcc a -> b
   foldr' step =
     peel []
     where
@@ -74,7 +92,7 @@ instance Foldable BinTree where
           _ ->
             acc
 
-  foldl :: (b -> a -> b) -> b -> BinTree a -> b
+  foldl :: (b -> a -> b) -> b -> NeAcc a -> b
   foldl step acc =
     \ case
       Branch a b ->
@@ -82,7 +100,7 @@ instance Foldable BinTree where
       Leaf a ->
         step acc a
     where
-      foldlOnBranch :: (b -> a -> b) -> b -> BinTree a -> BinTree a -> b
+      foldlOnBranch :: (b -> a -> b) -> b -> NeAcc a -> NeAcc a -> b
       foldlOnBranch step acc a b =
         case b of
           Leaf c ->
@@ -90,7 +108,7 @@ instance Foldable BinTree where
           Branch c d ->
             foldlOnBranch step acc (Branch a c) d
 
-  foldl' :: (b -> a -> b) -> b -> BinTree a -> b
+  foldl' :: (b -> a -> b) -> b -> NeAcc a -> b
   foldl' step !acc =
     \ case
       Branch a b ->
@@ -98,7 +116,7 @@ instance Foldable BinTree where
       Leaf a ->
         step acc a
     where
-      foldlOnBranch' :: (b -> a -> b) -> b -> BinTree a -> BinTree a -> b
+      foldlOnBranch' :: (b -> a -> b) -> b -> NeAcc a -> NeAcc a -> b
       foldlOnBranch' step acc a b =
         case a of
           Leaf c ->
@@ -106,41 +124,41 @@ instance Foldable BinTree where
           Branch c d ->
             foldlOnBranch' step acc c (Branch d b)
 
-  foldMap :: Monoid m => (a -> m) -> BinTree a -> m
+  foldMap :: Monoid m => (a -> m) -> NeAcc a -> m
   foldMap =
     foldMapTo mempty
     where
-      foldMapTo :: Monoid m => m -> (a -> m) -> BinTree a -> m
+      foldMapTo :: Monoid m => m -> (a -> m) -> NeAcc a -> m
       foldMapTo acc map =
         \ case
           Branch a b -> foldMapToOnBranch acc map a b
           Leaf a -> acc <> map a
-      foldMapToOnBranch :: Monoid m => m -> (a -> m) -> BinTree a -> BinTree a -> m
+      foldMapToOnBranch :: Monoid m => m -> (a -> m) -> NeAcc a -> NeAcc a -> m
       foldMapToOnBranch acc map a b =
         case a of
           Leaf c -> foldMapTo (acc <> map c) map b
           Branch c d -> foldMapToOnBranch acc map c (Branch d b)
 
 #if MIN_VERSION_base(4,13,0)
-  foldMap' :: Monoid m => (a -> m) -> BinTree a -> m
+  foldMap' :: Monoid m => (a -> m) -> NeAcc a -> m
   foldMap' =
     foldMapTo' mempty
     where
-      foldMapTo' :: Monoid m => m -> (a -> m) -> BinTree a -> m
+      foldMapTo' :: Monoid m => m -> (a -> m) -> NeAcc a -> m
       foldMapTo' !acc map =
         \ case
           Branch a b -> foldMapToOnBranch' acc map a b
           Leaf a -> acc <> map a
-      foldMapToOnBranch' :: Monoid m => m -> (a -> m) -> BinTree a -> BinTree a -> m
+      foldMapToOnBranch' :: Monoid m => m -> (a -> m) -> NeAcc a -> NeAcc a -> m
       foldMapToOnBranch' acc map a b =
         case a of
           Leaf c -> foldMapTo' (acc <> map c) map b
           Branch c d -> foldMapToOnBranch' acc map c (Branch d b)
 #endif
 
-instance Traversable BinTree where
+instance Traversable NeAcc where
 
-  traverse :: Applicative f => (a -> f b) -> BinTree a -> f (BinTree b)
+  traverse :: Applicative f => (a -> f b) -> NeAcc a -> f (NeAcc b)
   traverse map =
     \ case
       Branch a b ->
@@ -148,7 +166,7 @@ instance Traversable BinTree where
       Leaf a ->
         Leaf <$> map a
     where
-      traverseOnBranch :: Applicative f => (a -> f b) -> BinTree a -> BinTree a -> f (BinTree b)
+      traverseOnBranch :: Applicative f => (a -> f b) -> NeAcc a -> NeAcc a -> f (NeAcc b)
       traverseOnBranch map a b =
         case a of
           Leaf c ->
@@ -156,9 +174,9 @@ instance Traversable BinTree where
           Branch c d ->
             traverseOnBranch map a (Branch d b)
 
-instance Foldable1 BinTree where
+instance Foldable1 NeAcc where
 
-  fold1 :: Semigroup m => BinTree m -> m
+  fold1 :: Semigroup m => NeAcc m -> m
   fold1 =
     \ case
       Branch l r ->
@@ -166,7 +184,7 @@ instance Foldable1 BinTree where
       Leaf a ->
         a
 
-  foldMap1 :: Semigroup m => (a -> m) -> BinTree a -> m
+  foldMap1 :: Semigroup m => (a -> m) -> NeAcc a -> m
   foldMap1 f =
     \ case
       Branch l r ->
@@ -174,7 +192,7 @@ instance Foldable1 BinTree where
       Leaf a ->
         f a
 
-  toNonEmpty :: BinTree a -> NonEmpty a
+  toNonEmpty :: NeAcc a -> NonEmpty a
   toNonEmpty =
     findFirst
     where
@@ -191,7 +209,7 @@ instance Foldable1 BinTree where
           Leaf a ->
             a :| foldr (:) [] r
 
-instance Traversable1 BinTree where
+instance Traversable1 NeAcc where
 
   traverse1 map =
     \ case
@@ -207,11 +225,15 @@ instance Traversable1 BinTree where
           Branch c d ->
             traverseOnBranch map a (Branch d b)
 
-instance Alt BinTree where
+instance Alt NeAcc where
   (<!>) =
     Branch
 
-rebalancingLeft :: BinTree a -> BinTree a -> (a -> BinTree a -> b) -> b
+instance Semigroup (NeAcc a) where
+  (<>) =
+    Branch
+
+rebalancingLeft :: NeAcc a -> NeAcc a -> (a -> NeAcc a -> b) -> b
 rebalancingLeft l r cont =
   case l of
     Branch ll lr ->
@@ -219,31 +241,31 @@ rebalancingLeft l r cont =
     Leaf a ->
       cont a r
 
-foldM :: Monad m => (a -> b -> m a) -> a -> BinTree b -> m a
+foldM :: Monad m => (a -> b -> m a) -> a -> NeAcc b -> m a
 foldM step !acc =
   \ case
     Branch a b -> foldMOnBranch step acc a b
     Leaf a -> step acc a
   where
-    foldMOnBranch :: Monad m => (a -> b -> m a) -> a -> BinTree b -> BinTree b -> m a
+    foldMOnBranch :: Monad m => (a -> b -> m a) -> a -> NeAcc b -> NeAcc b -> m a
     foldMOnBranch step acc a b =
       case a of
         Leaf c -> step acc c >>= \ acc' -> foldM step acc' b
         Branch c d -> foldMOnBranch step acc c (Branch d b)
 
-fromList1 :: a -> [a] -> BinTree a
+fromList1 :: a -> [a] -> NeAcc a
 fromList1 a =
   \ case
     b : c -> fromList1To (Leaf a) b c
     _ -> Leaf a
 
-fromList1To :: BinTree a -> a -> [a] -> BinTree a
+fromList1To :: NeAcc a -> a -> [a] -> NeAcc a
 fromList1To leftTree a =
   \ case
     b : c -> fromList1To (Branch leftTree (Leaf a)) b c
     _ -> Branch leftTree (Leaf a)
 
-uncons :: BinTree a -> (a, Maybe (BinTree a))
+uncons :: NeAcc a -> (a, Maybe (NeAcc a))
 uncons =
   \ case
     Branch l r ->
@@ -251,7 +273,7 @@ uncons =
     Leaf a ->
       (a, Nothing)
 
-unconsTo :: BinTree a -> BinTree a -> (a, BinTree a)
+unconsTo :: NeAcc a -> NeAcc a -> (a, NeAcc a)
 unconsTo buff =
   \ case
     Branch l r ->
@@ -259,7 +281,7 @@ unconsTo buff =
     Leaf a ->
       (a, buff)
 
-unsnoc :: BinTree a -> (a, Maybe (BinTree a))
+unsnoc :: NeAcc a -> (a, Maybe (NeAcc a))
 unsnoc =
   \ case
     Branch l r ->
@@ -267,7 +289,7 @@ unsnoc =
     Leaf a ->
       (a, Nothing)
 
-unsnocTo :: BinTree a -> BinTree a -> (a, BinTree a)
+unsnocTo :: NeAcc a -> NeAcc a -> (a, NeAcc a)
 unsnocTo buff =
   \ case
     Branch l r ->
@@ -275,7 +297,7 @@ unsnocTo buff =
     Leaf a ->
       (a, buff)
 
-appendEnumFromTo :: (Enum a, Ord a) => a -> a -> BinTree a -> BinTree a
+appendEnumFromTo :: (Enum a, Ord a) => a -> a -> NeAcc a -> NeAcc a
 appendEnumFromTo from to =
   if from <= to
     then

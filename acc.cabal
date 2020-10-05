@@ -32,7 +32,7 @@ library
     Acc
     Acc.NeAcc
   other-modules:
-    Acc.BinTree
+    Acc.NeAcc.Def
     Acc.Prelude
   build-depends:
     base >=4.11 && <5,
