@@ -7,6 +7,7 @@ module Acc
   uncons,
   unsnoc,
   toNonEmpty,
+  toNeAcc,
   enumFromTo,
 )
 where
@@ -226,9 +227,16 @@ Convert to non empty list if it's not empty.
 -}
 toNonEmpty :: Acc a -> Maybe (NonEmpty a)
 toNonEmpty =
+  fmap Foldable1.toNonEmpty . toNeAcc
+
+{-|
+Convert to non empty acc if it's not empty.
+-}
+toNeAcc :: Acc a -> Maybe (NeAcc.NeAcc a)
+toNeAcc =
   \ case
     TreeAcc tree ->
-      Just (Foldable1.toNonEmpty tree)
+      Just tree
     EmptyAcc ->
       Nothing
 
