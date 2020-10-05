@@ -42,31 +42,37 @@ instance Foldable BinTree where
   
   foldr :: (a -> b -> b) -> b -> BinTree a -> b
   foldr step acc =
-    \ case
-      Branch a b ->
-        foldrOnBranch step acc a b
-      Leaf a ->
-        step a acc
+    peel []
     where
-      foldrOnBranch :: (a -> b -> b) -> b -> BinTree a -> BinTree a -> b
-      foldrOnBranch step acc a b =
-        case a of
-          Leaf c ->
-            step c (foldr step acc b)
-          Branch c d ->
-            foldrOnBranch step acc c (Branch d b)
+      peel layers =
+        \ case
+          Leaf a ->
+            step a (unpeel layers)
+          Branch l r ->
+            peel (r : layers) l
+      unpeel =
+        \ case
+          h : t ->
+            peel t h
+          _ ->
+            acc
 
   foldr' :: (a -> b -> b) -> b -> BinTree a -> b
-  foldr' step !acc =
-    \ case
-      Branch a b -> foldrOnBranch' step acc a b
-      Leaf a -> step a acc
+  foldr' step =
+    peel []
     where
-      foldrOnBranch' :: (a -> b -> b) -> b -> BinTree a -> BinTree a -> b
-      foldrOnBranch' step acc a b =
-        case b of
-          Leaf c -> foldr' step (step c acc) a
-          Branch c d -> foldrOnBranch' step acc (Branch a c) d
+      peel layers acc =
+        \ case
+          Leaf a ->
+            unpeel (step a acc) layers
+          Branch l r ->
+            peel (l : layers) acc r
+      unpeel !acc =
+        \ case
+          h : t ->
+            peel t acc h
+          _ ->
+            acc
 
   foldl :: (b -> a -> b) -> b -> BinTree a -> b
   foldl step acc =
