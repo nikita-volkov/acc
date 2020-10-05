@@ -7,10 +7,11 @@ module Acc
   uncons,
   unsnoc,
   toNonEmpty,
+  enumFromTo,
 )
 where
 
-import Acc.Prelude hiding (toNonEmpty)
+import Acc.Prelude hiding (toNonEmpty, enumFromTo)
 import qualified Acc.BinTree as BinTree
 import qualified Data.Foldable as Foldable
 import qualified Data.Semigroup.Foldable as Foldable1
@@ -229,3 +230,14 @@ toNonEmpty =
       Just (Foldable1.toNonEmpty tree)
     EmptyAcc ->
       Nothing
+
+{-|
+Enumerate in range, inclusively.
+-}
+enumFromTo :: (Enum a, Ord a) => a -> a -> Acc a
+enumFromTo from to =
+  if from <= to
+    then
+      TreeAcc (BinTree.appendEnumFromTo (succ from) to (BinTree.Leaf from))
+    else
+      EmptyAcc

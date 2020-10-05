@@ -8,6 +8,7 @@ module Acc.BinTree
   unconsTo,
   unsnoc,
   unsnocTo,
+  appendEnumFromTo,
 )
 where
 
@@ -267,3 +268,11 @@ unsnocTo buff =
       unsnocTo (Branch l buff) r
     Leaf a ->
       (a, buff)
+
+appendEnumFromTo :: (Enum a, Ord a) => a -> a -> BinTree a -> BinTree a
+appendEnumFromTo from to =
+  if from <= to
+    then
+      appendEnumFromTo (succ from) to . flip Branch (Leaf from)
+    else
+      id
