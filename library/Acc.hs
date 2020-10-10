@@ -52,6 +52,7 @@ instance NFData1 Acc
 deriving instance Functor Acc
 
 instance Foldable Acc where
+  {-# INLINE foldMap #-}
   foldMap f =
     \ case
       TreeAcc a ->
@@ -59,6 +60,7 @@ instance Foldable Acc where
       EmptyAcc ->
         mempty
 #if MIN_VERSION_base(4,13,0)
+  {-# INLINE foldMap' #-}
   foldMap' f =
     \ case
       TreeAcc a ->
@@ -66,30 +68,35 @@ instance Foldable Acc where
       EmptyAcc ->
         mempty
 #endif
+  {-# INLINE foldr #-}
   foldr step acc =
     \ case
       TreeAcc a ->
         foldr step acc a
       EmptyAcc ->
         acc
+  {-# INLINE foldr' #-}
   foldr' step acc =
     \ case
       TreeAcc a ->
         foldr' step acc a
       EmptyAcc ->
         acc
+  {-# INLINE foldl #-}
   foldl step acc =
     \ case
       TreeAcc a ->
         foldl step acc a
       EmptyAcc ->
         acc
+  {-# INLINE foldl' #-}
   foldl' step acc =
     \ case
       TreeAcc a ->
         foldl' step acc a
       EmptyAcc ->
         acc
+  {-# INLINE sum #-}
   sum =
     foldl' (+) 0
 
@@ -118,6 +125,7 @@ instance Applicative Acc where
 instance Alternative Acc where
   empty =
     EmptyAcc
+  {-# INLINE (<|>) #-}
   (<|>) =
     \ case
       TreeAcc a ->
@@ -130,6 +138,7 @@ instance Alternative Acc where
         id
 
 instance Semigroup (Acc a) where
+  {-# INLINE (<>) #-}
   (<>) =
     (<|>)
 
@@ -139,10 +148,12 @@ instance Monoid (Acc a) where
 
 instance IsList (Acc a) where
   type Item (Acc a) = a
+  {-# INLINE fromList #-}
   fromList =
     \ case
       a : b -> TreeAcc (NeAcc.fromList1 a b)
       _ -> EmptyAcc
+  {-# INLINE toList #-}
   toList =
     \ case
       TreeAcc a ->
@@ -157,6 +168,7 @@ instance Show a => Show (Acc a) where
 {-|
 Prepend an element.
 -}
+{-# INLINE cons #-}
 cons :: a -> Acc a -> Acc a
 cons a =
   \ case
@@ -173,6 +185,7 @@ and will have the underlying tree rebalanced towards the beginning.
 This means that calling 'uncons' on it will be \(\mathcal{O}(1)\) and
 'unsnoc' will be \(\mathcal{O}(n)\).
 -}
+{-# INLINE uncons #-}
 uncons :: Acc a -> Maybe (a, Acc a)
 uncons =
   \ case
@@ -190,6 +203,7 @@ uncons =
 {-|
 Append an element.
 -}
+{-# INLINE snoc #-}
 snoc :: a -> Acc a -> Acc a
 snoc a =
   \ case
@@ -206,6 +220,7 @@ and will have the underlying tree rebalanced towards the end.
 This means that calling 'unsnoc' on it will be \(\mathcal{O}(1)\) and
 'uncons' will be \(\mathcal{O}(n)\).
 -}
+{-# INLINE unsnoc #-}
 unsnoc :: Acc a -> Maybe (a, Acc a)
 unsnoc =
   \ case
@@ -223,6 +238,7 @@ unsnoc =
 {-|
 Convert to non empty list if it's not empty.
 -}
+{-# INLINE toNonEmpty #-}
 toNonEmpty :: Acc a -> Maybe (NonEmpty a)
 toNonEmpty =
   fmap Foldable1.toNonEmpty . toNeAcc
@@ -230,6 +246,7 @@ toNonEmpty =
 {-|
 Convert to non empty acc if it's not empty.
 -}
+{-# INLINE toNeAcc #-}
 toNeAcc :: Acc a -> Maybe (NeAcc.NeAcc a)
 toNeAcc =
   \ case
@@ -241,6 +258,7 @@ toNeAcc =
 {-|
 Enumerate in range, inclusively.
 -}
+{-# INLINE enumFromTo #-}
 enumFromTo :: (Enum a, Ord a) => a -> a -> Acc a
 enumFromTo from to =
   if from <= to

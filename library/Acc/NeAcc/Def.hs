@@ -36,10 +36,12 @@ instance NFData1 NeAcc
 
 instance IsList (NeAcc a) where
   type Item (NeAcc a) = a
+  {-# INLINE fromList #-}
   fromList =
     \ case
       a : b -> fromList1 a b
       _ -> error "Empty input list"
+  {-# INLINE toList #-}
   toList =
     foldr (:) []
 
@@ -48,6 +50,7 @@ deriving instance Functor NeAcc
 instance Applicative NeAcc where
   pure =
     Leaf
+  {-# INLINE (<*>) #-}
   (<*>) =
     \ case
       Branch a b ->
@@ -58,6 +61,7 @@ instance Applicative NeAcc where
 
 instance Foldable NeAcc where
   
+  {-# INLINE foldr #-}
   foldr :: (a -> b -> b) -> b -> NeAcc a -> b
   foldr step acc =
     peel []
@@ -75,6 +79,7 @@ instance Foldable NeAcc where
           _ ->
             acc
 
+  {-# INLINE foldr' #-}
   foldr' :: (a -> b -> b) -> b -> NeAcc a -> b
   foldr' step =
     peel []
@@ -91,7 +96,8 @@ instance Foldable NeAcc where
             peel t acc h
           _ ->
             acc
-
+  
+  {-# INLINE foldl #-}
   foldl :: (b -> a -> b) -> b -> NeAcc a -> b
   foldl step acc =
     \ case
@@ -108,6 +114,7 @@ instance Foldable NeAcc where
           Branch c d ->
             foldlOnBranch step acc (Branch a c) d
 
+  {-# INLINE foldl' #-}
   foldl' :: (b -> a -> b) -> b -> NeAcc a -> b
   foldl' step !acc =
     \ case
@@ -124,6 +131,7 @@ instance Foldable NeAcc where
           Branch c d ->
             foldlOnBranch' step acc c (Branch d b)
 
+  {-# INLINE foldMap #-}
   foldMap :: Monoid m => (a -> m) -> NeAcc a -> m
   foldMap =
     foldMapTo mempty
@@ -140,6 +148,7 @@ instance Foldable NeAcc where
           Branch c d -> foldMapToOnBranch acc map c (Branch d b)
 
 #if MIN_VERSION_base(4,13,0)
+  {-# INLINE foldMap' #-}
   foldMap' :: Monoid m => (a -> m) -> NeAcc a -> m
   foldMap' =
     foldMapTo' mempty
@@ -233,6 +242,7 @@ instance Semigroup (NeAcc a) where
   (<>) =
     Branch
 
+{-# INLINE rebalancingLeft #-}
 rebalancingLeft :: NeAcc a -> NeAcc a -> (a -> NeAcc a -> b) -> b
 rebalancingLeft l r cont =
   case l of
@@ -265,6 +275,7 @@ fromList1To leftTree a =
     b : c -> fromList1To (Branch leftTree (Leaf a)) b c
     _ -> Branch leftTree (Leaf a)
 
+{-# INLINE uncons #-}
 uncons :: NeAcc a -> (a, Maybe (NeAcc a))
 uncons =
   \ case
@@ -273,6 +284,7 @@ uncons =
     Leaf a ->
       (a, Nothing)
 
+{-# INLINE unconsTo #-}
 unconsTo :: NeAcc a -> NeAcc a -> (a, NeAcc a)
 unconsTo buff =
   \ case
