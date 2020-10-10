@@ -61,7 +61,7 @@ instance Applicative NeAcc where
 
 instance Foldable NeAcc where
   
-  {-# INLINE foldr #-}
+  {-# INLINABLE foldr #-}
   foldr :: (a -> b -> b) -> b -> NeAcc a -> b
   foldr step acc =
     peel []
@@ -133,19 +133,21 @@ instance Foldable NeAcc where
 
   {-# INLINE foldMap #-}
   foldMap :: Monoid m => (a -> m) -> NeAcc a -> m
-  foldMap =
-    foldMapTo mempty
+  foldMap map =
+    peel
     where
-      foldMapTo :: Monoid m => m -> (a -> m) -> NeAcc a -> m
-      foldMapTo acc map =
+      peel =
         \ case
-          Branch a b -> foldMapToOnBranch acc map a b
-          Leaf a -> acc <> map a
-      foldMapToOnBranch :: Monoid m => m -> (a -> m) -> NeAcc a -> NeAcc a -> m
-      foldMapToOnBranch acc map a b =
-        case a of
-          Leaf c -> foldMapTo (acc <> map c) map b
-          Branch c d -> foldMapToOnBranch acc map c (Branch d b)
+          Branch a b ->
+            peelLeft b a
+          Leaf a ->
+            map a
+      peelLeft buff =
+        \ case
+          Branch a b ->
+            peelLeft (Branch b buff) a
+          Leaf a ->
+            map a <> peel buff
 
 #if MIN_VERSION_base(4,13,0)
   {-# INLINE foldMap' #-}
