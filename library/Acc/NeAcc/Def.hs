@@ -36,12 +36,12 @@ instance NFData1 NeAcc
 
 instance IsList (NeAcc a) where
   type Item (NeAcc a) = a
-  {-# INLINE fromList #-}
+  {-# INLINE [0] fromList #-}
   fromList =
     \ case
       a : b -> fromList1 a b
       _ -> error "Empty input list"
-  {-# INLINE toList #-}
+  {-# INLINE [0] toList #-}
   toList =
     foldr (:) []
 
@@ -50,7 +50,7 @@ deriving instance Functor NeAcc
 instance Applicative NeAcc where
   pure =
     Leaf
-  {-# INLINE (<*>) #-}
+  {-# INLINE [1] (<*>) #-}
   (<*>) =
     \ case
       Branch a b ->
@@ -61,7 +61,7 @@ instance Applicative NeAcc where
 
 instance Foldable NeAcc where
   
-  {-# INLINABLE foldr #-}
+  {-# INLINABLE [0] foldr #-}
   foldr :: (a -> b -> b) -> b -> NeAcc a -> b
   foldr step acc =
     peel []
@@ -79,7 +79,7 @@ instance Foldable NeAcc where
           _ ->
             acc
 
-  {-# INLINE foldr' #-}
+  {-# INLINE [0] foldr' #-}
   foldr' :: (a -> b -> b) -> b -> NeAcc a -> b
   foldr' step =
     peel []
@@ -97,7 +97,7 @@ instance Foldable NeAcc where
           _ ->
             acc
   
-  {-# INLINE foldl #-}
+  {-# INLINE [0] foldl #-}
   foldl :: (b -> a -> b) -> b -> NeAcc a -> b
   foldl step acc =
     \ case
@@ -114,7 +114,7 @@ instance Foldable NeAcc where
           Branch c d ->
             foldlOnBranch step acc (Branch a c) d
 
-  {-# INLINE foldl' #-}
+  {-# INLINE [0] foldl' #-}
   foldl' :: (b -> a -> b) -> b -> NeAcc a -> b
   foldl' step !acc =
     \ case
@@ -131,7 +131,7 @@ instance Foldable NeAcc where
           Branch c d ->
             foldlOnBranch' step acc c (Branch d b)
 
-  {-# INLINE foldMap #-}
+  {-# INLINE [0] foldMap #-}
   foldMap :: Monoid m => (a -> m) -> NeAcc a -> m
   foldMap map =
     peel
@@ -150,7 +150,7 @@ instance Foldable NeAcc where
             map a <> peel buff
 
 #if MIN_VERSION_base(4,13,0)
-  {-# INLINE foldMap' #-}
+  {-# INLINE [0] foldMap' #-}
   foldMap' :: Monoid m => (a -> m) -> NeAcc a -> m
   foldMap' =
     foldMapTo' mempty
@@ -169,6 +169,7 @@ instance Foldable NeAcc where
 
 instance Traversable NeAcc where
 
+  {-# INLINE [0] traverse #-}
   traverse :: Applicative f => (a -> f b) -> NeAcc a -> f (NeAcc b)
   traverse map =
     \ case
@@ -187,6 +188,7 @@ instance Traversable NeAcc where
 
 instance Foldable1 NeAcc where
 
+  {-# INLINE [0] fold1 #-}
   fold1 :: Semigroup m => NeAcc m -> m
   fold1 =
     \ case
@@ -195,6 +197,7 @@ instance Foldable1 NeAcc where
       Leaf a ->
         a
 
+  {-# INLINE [0] foldMap1 #-}
   foldMap1 :: Semigroup m => (a -> m) -> NeAcc a -> m
   foldMap1 f =
     \ case
@@ -203,6 +206,7 @@ instance Foldable1 NeAcc where
       Leaf a ->
         f a
 
+  {-# INLINE [0] toNonEmpty #-}
   toNonEmpty :: NeAcc a -> NonEmpty a
   toNonEmpty =
     findFirst
@@ -222,6 +226,7 @@ instance Foldable1 NeAcc where
 
 instance Traversable1 NeAcc where
 
+  {-# INLINE [0] traverse1 #-}
   traverse1 map =
     \ case
       Branch a b ->

@@ -52,7 +52,7 @@ instance NFData1 Acc
 deriving instance Functor Acc
 
 instance Foldable Acc where
-  {-# INLINE foldMap #-}
+  {-# INLINE [0] foldMap #-}
   foldMap f =
     \ case
       TreeAcc a ->
@@ -60,7 +60,7 @@ instance Foldable Acc where
       EmptyAcc ->
         mempty
 #if MIN_VERSION_base(4,13,0)
-  {-# INLINE foldMap' #-}
+  {-# INLINE [0] foldMap' #-}
   foldMap' f =
     \ case
       TreeAcc a ->
@@ -68,40 +68,40 @@ instance Foldable Acc where
       EmptyAcc ->
         mempty
 #endif
-  {-# INLINE foldr #-}
+  {-# INLINE [0] foldr #-}
   foldr step acc =
     \ case
       TreeAcc a ->
         foldr step acc a
       EmptyAcc ->
         acc
-  {-# INLINE foldr' #-}
+  {-# INLINE [0] foldr' #-}
   foldr' step acc =
     \ case
       TreeAcc a ->
         foldr' step acc a
       EmptyAcc ->
         acc
-  {-# INLINE foldl #-}
+  {-# INLINE [0] foldl #-}
   foldl step acc =
     \ case
       TreeAcc a ->
         foldl step acc a
       EmptyAcc ->
         acc
-  {-# INLINE foldl' #-}
+  {-# INLINE [0] foldl' #-}
   foldl' step acc =
     \ case
       TreeAcc a ->
         foldl' step acc a
       EmptyAcc ->
         acc
-  {-# INLINE sum #-}
+  {-# INLINE [0] sum #-}
   sum =
     foldl' (+) 0
 
 instance Traversable Acc where
-  {-# INLINE traverse #-}
+  {-# INLINE [0] traverse #-}
   traverse f =
     \ case
       TreeAcc a ->
@@ -110,10 +110,10 @@ instance Traversable Acc where
         pure EmptyAcc
 
 instance Applicative Acc where
-  {-# INLINE pure #-}
+  {-# INLINE [1] pure #-}
   pure =
     TreeAcc . NeAcc.Leaf
-  {-# INLINE (<*>) #-}
+  {-# INLINE [1] (<*>) #-}
   (<*>) =
     \ case
       TreeAcc a ->
@@ -153,12 +153,12 @@ instance Monoid (Acc a) where
 
 instance IsList (Acc a) where
   type Item (Acc a) = a
-  {-# INLINE fromList #-}
+  {-# INLINE [0] fromList #-}
   fromList =
     \ case
       a : b -> TreeAcc (NeAcc.fromList1 a b)
       _ -> EmptyAcc
-  {-# INLINE toList #-}
+  {-# INLINE [0] toList #-}
   toList =
     \ case
       TreeAcc a ->
@@ -173,7 +173,7 @@ instance Show a => Show (Acc a) where
 {-|
 Prepend an element.
 -}
-{-# INLINE cons #-}
+{-# INLINE [1] cons #-}
 cons :: a -> Acc a -> Acc a
 cons a =
   \ case
@@ -208,7 +208,7 @@ uncons =
 {-|
 Append an element.
 -}
-{-# INLINE snoc #-}
+{-# INLINE [1] snoc #-}
 snoc :: a -> Acc a -> Acc a
 snoc a =
   \ case
@@ -263,7 +263,7 @@ toNeAcc =
 {-|
 Enumerate in range, inclusively.
 -}
-{-# INLINE enumFromTo #-}
+{-# INLINE [1] enumFromTo #-}
 enumFromTo :: (Enum a, Ord a) => a -> a -> Acc a
 enumFromTo from to =
   if from <= to
