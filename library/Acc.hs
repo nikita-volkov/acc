@@ -101,6 +101,7 @@ instance Foldable Acc where
     foldl' (+) 0
 
 instance Traversable Acc where
+  {-# INLINE traverse #-}
   traverse f =
     \ case
       TreeAcc a ->
@@ -109,8 +110,10 @@ instance Traversable Acc where
         pure EmptyAcc
 
 instance Applicative Acc where
+  {-# INLINE pure #-}
   pure =
     TreeAcc . NeAcc.Leaf
+  {-# INLINE (<*>) #-}
   (<*>) =
     \ case
       TreeAcc a ->
@@ -123,9 +126,10 @@ instance Applicative Acc where
         const EmptyAcc
 
 instance Alternative Acc where
+  {-# INLINE [1] empty #-}
   empty =
     EmptyAcc
-  {-# INLINE (<|>) #-}
+  {-# INLINE [1] (<|>) #-}
   (<|>) =
     \ case
       TreeAcc a ->
@@ -138,11 +142,12 @@ instance Alternative Acc where
         id
 
 instance Semigroup (Acc a) where
-  {-# INLINE (<>) #-}
+  {-# INLINE [1] (<>) #-}
   (<>) =
     (<|>)
 
 instance Monoid (Acc a) where
+  {-# INLINE [1] mempty #-}
   mempty =
     empty
 

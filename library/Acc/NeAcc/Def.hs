@@ -139,13 +139,13 @@ instance Foldable NeAcc where
       peel =
         \ case
           Branch a b ->
-            peelLeft b a
+            peelLeftStacking b a
           Leaf a ->
             map a
-      peelLeft buff =
+      peelLeftStacking buff =
         \ case
           Branch a b ->
-            peelLeft (Branch b buff) a
+            peelLeftStacking (Branch b buff) a
           Leaf a ->
             map a <> peel buff
 
@@ -237,10 +237,12 @@ instance Traversable1 NeAcc where
             traverseOnBranch map a (Branch d b)
 
 instance Alt NeAcc where
+  {-# INLINE [1] (<!>) #-}
   (<!>) =
     Branch
 
 instance Semigroup (NeAcc a) where
+  {-# INLINE [1] (<>) #-}
   (<>) =
     Branch
 
