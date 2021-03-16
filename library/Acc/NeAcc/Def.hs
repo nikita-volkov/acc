@@ -57,10 +57,10 @@ instance Applicative NeAcc where
         \ c ->
           Branch (a <*> c) (b <*> c)
       Leaf a ->
-        fmap a 
+        fmap a
 
 instance Foldable NeAcc where
-  
+
   {-# INLINABLE foldr #-}
   foldr :: (a -> b -> b) -> b -> NeAcc a -> b
   foldr step acc =
@@ -96,7 +96,7 @@ instance Foldable NeAcc where
             peel t acc h
           _ ->
             acc
-  
+
   {-# INLINE foldl #-}
   foldl :: (b -> a -> b) -> b -> NeAcc a -> b
   foldl step acc =
@@ -181,7 +181,7 @@ instance Traversable NeAcc where
       traverseOnBranch map a b =
         case a of
           Leaf c ->
-            Branch <$> Leaf <$> map c <*> traverse map b
+            Branch . Leaf <$> map c <*> traverse map b
           Branch c d ->
             traverseOnBranch map a (Branch d b)
 
@@ -232,7 +232,7 @@ instance Traversable1 NeAcc where
       traverseOnBranch map a b =
         case a of
           Leaf c ->
-            Branch <$> Leaf <$> map c <.> traverse1 map b
+            Branch . Leaf <$> map c <.> traverse1 map b
           Branch c d ->
             traverseOnBranch map a (Branch d b)
 
