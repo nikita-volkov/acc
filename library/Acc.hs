@@ -43,7 +43,7 @@ ensuring that you don\'t get stack overflow.
 data Acc a =
   EmptyAcc |
   TreeAcc !(NeAcc.NeAcc a)
-  deriving (Generic, Generic1)
+  deriving (Generic, Generic1, Eq, Ord, Typeable, Data)
 
 instance NFData a => NFData (Acc a)
 

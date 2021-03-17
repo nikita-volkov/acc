@@ -24,7 +24,7 @@ Relates to 'Acc.Acc' the same way as 'NonEmpty' to list.
 data NeAcc a =
   Leaf !a |
   Branch !(NeAcc a) !(NeAcc a)
-  deriving (Generic, Generic1)
+  deriving (Generic, Generic1, Eq, Ord, Typeable, Data)
 
 instance Show a => Show (NeAcc a) where
   show =
