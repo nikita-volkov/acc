@@ -6,4 +6,5 @@ stack \
 build \
 --ghc-options "-O2 -threaded" \
 --bench \
+--ba "-s" \
 acc:bench

@@ -53,7 +53,7 @@ benchmark bench
     -funbox-strict-fields
   build-depends:
     acc,
-    criterion >=1.5.6 && <2,
+    gauge >=0.2.5 && <0.3,
     rerebase >=1.9 && <2
 
 test-suite test

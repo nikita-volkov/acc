@@ -1,8 +1,8 @@
 module Main where
 
 import qualified Acc
-import Criterion
-import Criterion.Main
+import Gauge
+import Gauge.Main
 import qualified Data.DList as DList
 import qualified Data.Foldable as Foldable
 import qualified Data.Sequence as Seq
