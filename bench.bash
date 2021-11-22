@@ -6,4 +6,4 @@ stack \
 build \
 --ghc-options "-O2 -threaded" \
 --bench \
-acc:benchmark
+acc:bench
