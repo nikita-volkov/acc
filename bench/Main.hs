@@ -27,6 +27,8 @@ main =
             let !input = force $ enumFromTo 0 size :: [Int]
              in [ reduceConstructBench "acc" input sum $
                     foldl' (flip Acc.snoc) mempty,
+                  reduceConstructBench "list" input sum $
+                    foldl' (\list a -> list <> [a]) mempty,
                   reduceConstructBench "dlist" input sum $
                     foldl' DList.snoc mempty,
                   reduceConstructBench "sequence" input sum $
@@ -50,7 +52,7 @@ main =
 
 -- |
 -- Construct a benchmark that measures construction of the intermediate representation
--- and folding using sum.
+-- and reduction, ensuring that they don't get fused.
 {-# NOINLINE reduceConstructBench #-}
 reduceConstructBench ::
   NFData reduction =>
