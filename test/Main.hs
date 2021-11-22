@@ -1,66 +1,59 @@
 module Main where
 
-import Prelude hiding (assert)
+import Acc
+import qualified Data.List.NonEmpty as NonEmpty
 import GHC.Exts (fromList)
+import qualified Test.QuickCheck as QuickCheck
 import Test.QuickCheck.Instances
 import Test.Tasty
-import Test.Tasty.Runners
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
-import Acc
-import qualified Test.QuickCheck as QuickCheck
-import qualified Data.List.NonEmpty as NonEmpty
-
+import Test.Tasty.Runners
+import Prelude hiding (assert)
 
 main =
-  defaultMain $ 
-  testGroup "All tests" [
-    testProperty "Acc converted to list and reconstructed from it converts to the same list again" $
-      \ (acc :: Acc Int) -> let
-        list =
-          toList acc
-        acc' :: Acc Int
-        acc' =
-          fromList list
-        list' =
-          toList acc'
-        in list === list'
-    ,
-    testProperty "foldl" $
-      \ (acc :: Acc Int) ->
-        foldl (flip (:)) [] acc ===
-        foldl (flip (:)) [] (toList acc)
-    ,
-    testProperty "foldl'" $
-      \ (acc :: Acc Int) ->
-        foldl' (flip (:)) [] acc ===
-        foldl' (flip (:)) [] (toList acc)
-    ,
-    testProperty "foldr" $
-      \ (acc :: Acc Int) ->
-        foldr (:) [] acc ===
-        foldr (:) [] (toList acc)
-    ,
-    testProperty "foldr'" $
-      \ (acc :: Acc Int) ->
-        foldr' (:) [] acc ===
-        foldr' (:) [] (toList acc)
-    ,
-    testProperty "foldMap" $
-      \ (acc :: Acc Int) ->
-        foldMap (: []) acc ===
-        foldMap (: []) (toList acc)
-    ,
-    testProperty "foldMap'" $
-      \ (acc :: Acc Int) ->
-        foldMap' (: []) acc ===
-        foldMap' (: []) (toList acc)
-    ,
-    testProperty "toNonEmpty" $
-      \ (acc :: Acc Int) ->
-        Acc.toNonEmpty acc ===
-        NonEmpty.nonEmpty (toList acc)
-    ]
+  defaultMain $
+    testGroup
+      "All tests"
+      [ testProperty "Acc converted to list and reconstructed from it converts to the same list again" $
+          \(acc :: Acc Int) ->
+            let list =
+                  toList acc
+                acc' :: Acc Int
+                acc' =
+                  fromList list
+                list' =
+                  toList acc'
+             in list === list',
+        testProperty "foldl" $
+          \(acc :: Acc Int) ->
+            foldl (flip (:)) [] acc
+              === foldl (flip (:)) [] (toList acc),
+        testProperty "foldl'" $
+          \(acc :: Acc Int) ->
+            foldl' (flip (:)) [] acc
+              === foldl' (flip (:)) [] (toList acc),
+        testProperty "foldr" $
+          \(acc :: Acc Int) ->
+            foldr (:) [] acc
+              === foldr (:) [] (toList acc),
+        testProperty "foldr'" $
+          \(acc :: Acc Int) ->
+            foldr' (:) [] acc
+              === foldr' (:) [] (toList acc),
+        testProperty "foldMap" $
+          \(acc :: Acc Int) ->
+            foldMap (: []) acc
+              === foldMap (: []) (toList acc),
+        testProperty "foldMap'" $
+          \(acc :: Acc Int) ->
+            foldMap' (: []) acc
+              === foldMap' (: []) (toList acc),
+        testProperty "toNonEmpty" $
+          \(acc :: Acc Int) ->
+            Acc.toNonEmpty acc
+              === NonEmpty.nonEmpty (toList acc)
+      ]
 
 instance Arbitrary a => Arbitrary (Acc a) where
   arbitrary =
@@ -68,10 +61,10 @@ instance Arbitrary a => Arbitrary (Acc a) where
 
 accGen :: Gen a -> Gen (Acc a)
 accGen aGen =
-  oneof [
-    listAccGen aGen,
-    appendAccGen aGen,
-    pureAccGen aGen
+  oneof
+    [ listAccGen aGen,
+      appendAccGen aGen,
+      pureAccGen aGen
     ]
 
 listAccGen :: Gen a -> Gen (Acc a)

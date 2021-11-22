@@ -1,29 +1,27 @@
 {-# LANGUAGE CPP #-}
+
 module Acc.NeAcc.Def
-(
-  NeAcc(..),
-  foldM,
-  fromList1,
-  uncons,
-  unconsTo,
-  unsnoc,
-  unsnocTo,
-  appendEnumFromTo,
-)
+  ( NeAcc (..),
+    foldM,
+    fromList1,
+    uncons,
+    unconsTo,
+    unsnoc,
+    unsnocTo,
+    appendEnumFromTo,
+  )
 where
 
 import Acc.Prelude hiding (foldM)
 import qualified Acc.Prelude as Prelude
 
-
-{-|
-Non-empty accumulator.
-
-Relates to 'Acc.Acc' the same way as 'NonEmpty' to list.
--}
-data NeAcc a =
-  Leaf !a |
-  Branch !(NeAcc a) !(NeAcc a)
+-- |
+-- Non-empty accumulator.
+--
+-- Relates to 'Acc.Acc' the same way as 'NonEmpty' to list.
+data NeAcc a
+  = Leaf !a
+  | Branch !(NeAcc a) !(NeAcc a)
   deriving (Generic, Generic1)
 
 instance Show a => Show (NeAcc a) where
@@ -38,7 +36,7 @@ instance IsList (NeAcc a) where
   type Item (NeAcc a) = a
   {-# INLINE [0] fromList #-}
   fromList =
-    \ case
+    \case
       a : b -> fromList1 a b
       _ -> error "Empty input list"
   {-# INLINE [0] toList #-}
@@ -52,28 +50,27 @@ instance Applicative NeAcc where
     Leaf
   {-# INLINE [1] (<*>) #-}
   (<*>) =
-    \ case
+    \case
       Branch a b ->
-        \ c ->
+        \c ->
           Branch (a <*> c) (b <*> c)
       Leaf a ->
         fmap a
 
 instance Foldable NeAcc where
-
-  {-# INLINABLE [0] foldr #-}
+  {-# INLINEABLE [0] foldr #-}
   foldr :: (a -> b -> b) -> b -> NeAcc a -> b
   foldr step acc =
     peel []
     where
       peel layers =
-        \ case
+        \case
           Leaf a ->
             step a (unpeel layers)
           Branch l r ->
             peel (r : layers) l
       unpeel =
-        \ case
+        \case
           h : t ->
             peel t h
           _ ->
@@ -85,13 +82,13 @@ instance Foldable NeAcc where
     peel []
     where
       peel layers acc =
-        \ case
+        \case
           Leaf a ->
             unpeel (step a acc) layers
           Branch l r ->
             peel (l : layers) acc r
       unpeel !acc =
-        \ case
+        \case
           h : t ->
             peel t acc h
           _ ->
@@ -100,7 +97,7 @@ instance Foldable NeAcc where
   {-# INLINE [0] foldl #-}
   foldl :: (b -> a -> b) -> b -> NeAcc a -> b
   foldl step acc =
-    \ case
+    \case
       Branch a b ->
         foldlOnBranch step acc a b
       Leaf a ->
@@ -117,7 +114,7 @@ instance Foldable NeAcc where
   {-# INLINE [0] foldl' #-}
   foldl' :: (b -> a -> b) -> b -> NeAcc a -> b
   foldl' step !acc =
-    \ case
+    \case
       Branch a b ->
         foldlOnBranch' step acc a b
       Leaf a ->
@@ -137,13 +134,13 @@ instance Foldable NeAcc where
     peel
     where
       peel =
-        \ case
+        \case
           Branch a b ->
             peelLeftStacking b a
           Leaf a ->
             map a
       peelLeftStacking buff =
-        \ case
+        \case
           Branch a b ->
             peelLeftStacking (Branch b buff) a
           Leaf a ->
@@ -168,11 +165,10 @@ instance Foldable NeAcc where
 #endif
 
 instance Traversable NeAcc where
-
   {-# INLINE [0] traverse #-}
   traverse :: Applicative f => (a -> f b) -> NeAcc a -> f (NeAcc b)
   traverse map =
-    \ case
+    \case
       Branch a b ->
         traverseOnBranch map a b
       Leaf a ->
@@ -187,11 +183,10 @@ instance Traversable NeAcc where
             traverseOnBranch map a (Branch d b)
 
 instance Foldable1 NeAcc where
-
   {-# INLINE [0] fold1 #-}
   fold1 :: Semigroup m => NeAcc m -> m
   fold1 =
-    \ case
+    \case
       Branch l r ->
         rebalancingLeft l r (foldl' (<>))
       Leaf a ->
@@ -200,9 +195,9 @@ instance Foldable1 NeAcc where
   {-# INLINE [0] foldMap1 #-}
   foldMap1 :: Semigroup m => (a -> m) -> NeAcc a -> m
   foldMap1 f =
-    \ case
+    \case
       Branch l r ->
-        rebalancingLeft l r (foldl' (\ m a -> m <> f a) . f)
+        rebalancingLeft l r (foldl' (\m a -> m <> f a) . f)
       Leaf a ->
         f a
 
@@ -212,7 +207,7 @@ instance Foldable1 NeAcc where
     findFirst
     where
       findFirst =
-        \ case
+        \case
           Branch l r ->
             findFirstOnBranch l r
           Leaf a ->
@@ -225,10 +220,9 @@ instance Foldable1 NeAcc where
             a :| foldr (:) [] r
 
 instance Traversable1 NeAcc where
-
   {-# INLINE [0] traverse1 #-}
   traverse1 map =
-    \ case
+    \case
       Branch a b ->
         traverseOnBranch map a b
       Leaf a ->
@@ -262,32 +256,32 @@ rebalancingLeft l r cont =
 
 foldM :: Monad m => (a -> b -> m a) -> a -> NeAcc b -> m a
 foldM step !acc =
-  \ case
+  \case
     Branch a b -> foldMOnBranch step acc a b
     Leaf a -> step acc a
   where
     foldMOnBranch :: Monad m => (a -> b -> m a) -> a -> NeAcc b -> NeAcc b -> m a
     foldMOnBranch step acc a b =
       case a of
-        Leaf c -> step acc c >>= \ acc' -> foldM step acc' b
+        Leaf c -> step acc c >>= \acc' -> foldM step acc' b
         Branch c d -> foldMOnBranch step acc c (Branch d b)
 
 fromList1 :: a -> [a] -> NeAcc a
 fromList1 a =
-  \ case
+  \case
     b : c -> fromList1To (Leaf a) b c
     _ -> Leaf a
 
 fromList1To :: NeAcc a -> a -> [a] -> NeAcc a
 fromList1To leftTree a =
-  \ case
+  \case
     b : c -> fromList1To (Branch leftTree (Leaf a)) b c
     _ -> Branch leftTree (Leaf a)
 
 {-# INLINE uncons #-}
 uncons :: NeAcc a -> (a, Maybe (NeAcc a))
 uncons =
-  \ case
+  \case
     Branch l r ->
       fmap Just (unconsTo r l)
     Leaf a ->
@@ -296,7 +290,7 @@ uncons =
 {-# INLINE unconsTo #-}
 unconsTo :: NeAcc a -> NeAcc a -> (a, NeAcc a)
 unconsTo buff =
-  \ case
+  \case
     Branch l r ->
       unconsTo (Branch r buff) l
     Leaf a ->
@@ -304,7 +298,7 @@ unconsTo buff =
 
 unsnoc :: NeAcc a -> (a, Maybe (NeAcc a))
 unsnoc =
-  \ case
+  \case
     Branch l r ->
       fmap Just (unsnocTo l r)
     Leaf a ->
@@ -312,7 +306,7 @@ unsnoc =
 
 unsnocTo :: NeAcc a -> NeAcc a -> (a, NeAcc a)
 unsnocTo buff =
-  \ case
+  \case
     Branch l r ->
       unsnocTo (Branch l buff) r
     Leaf a ->
@@ -321,7 +315,5 @@ unsnocTo buff =
 appendEnumFromTo :: (Enum a, Ord a) => a -> a -> NeAcc a -> NeAcc a
 appendEnumFromTo from to =
   if from <= to
-    then
-      appendEnumFromTo (succ from) to . flip Branch (Leaf from)
-    else
-      id
+    then appendEnumFromTo (succ from) to . flip Branch (Leaf from)
+    else id
