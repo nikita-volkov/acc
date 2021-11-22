@@ -14,23 +14,36 @@ main =
     [ bgroup "sum" $
         [ byMagnitudeUpTo "cons" 3 $ \size ->
             let !input = force $ enumFromTo 0 size :: [Int]
-             in [ sumBench "acc" input sum $
+             in [ reduceConstructBench "acc" input sum $
                     foldl' (flip Acc.cons) mempty,
-                  sumBench "list" input sum $
+                  reduceConstructBench "list" input sum $
                     foldl' (flip (:)) [],
-                  sumBench "dlist" input sum $
+                  reduceConstructBench "dlist" input sum $
                     foldl' (flip DList.cons) mempty,
-                  sumBench "sequence" input sum $
+                  reduceConstructBench "sequence" input sum $
                     foldl' (flip (Sequence.<|)) mempty
                 ],
           byMagnitudeUpTo "snoc" 3 $ \size ->
             let !input = force $ enumFromTo 0 size :: [Int]
-             in [ sumBench "acc" input sum $
+             in [ reduceConstructBench "acc" input sum $
                     foldl' (flip Acc.snoc) mempty,
-                  sumBench "dlist" input sum $
+                  reduceConstructBench "dlist" input sum $
                     foldl' DList.snoc mempty,
-                  sumBench "sequence" input sum $
+                  reduceConstructBench "sequence" input sum $
                     foldl' (Sequence.|>) mempty
+                ]
+        ],
+      bgroup "length" $
+        [ byMagnitudeUpTo "cons" 3 $ \size ->
+            let !input = force $ enumFromTo 0 size :: [Int]
+             in [ reduceConstructBench "acc" input length $
+                    foldl' (flip Acc.cons) mempty,
+                  reduceConstructBench "list" input length $
+                    foldl' (flip (:)) [],
+                  reduceConstructBench "dlist" input length $
+                    foldl' (flip DList.cons) mempty,
+                  reduceConstructBench "sequence" input length $
+                    foldl' (flip (Sequence.<|)) mempty
                 ]
         ]
     ]
@@ -38,25 +51,20 @@ main =
 -- |
 -- Construct a benchmark that measures construction of the intermediate representation
 -- and folding using sum.
---
--- As a bonus,
--- before benchmarking it ensures that the conversion is correct
--- by using the input as the reference.
-{-# NOINLINE sumBench #-}
-sumBench ::
+{-# NOINLINE reduceConstructBench #-}
+reduceConstructBench ::
+  NFData reduction =>
   -- | Benchmark name.
   String ->
   -- | Input sample.
-  [Int] ->
-  -- | Reducer of the intermediate representation to sum.
-  (acc -> Int) ->
+  [a] ->
+  -- | Reducer of the intermediate representation.
+  (intermediate -> reduction) ->
   -- | Constructor of the intermediate representation.
-  ([Int] -> acc) ->
+  ([a] -> intermediate) ->
   Benchmark
-sumBench name list reducer constructor =
-  if sum list == reducer (constructor list)
-    then bench name $ nf (reducer . constructor) list
-    else error $ "Conversion is incorrect on " <> name
+reduceConstructBench name list reducer constructor =
+  bench name $ nf (reducer . constructor) list
 
 byMagnitudeUpTo :: String -> Int -> (Int -> [Benchmark]) -> Benchmark
 byMagnitudeUpTo groupName amount benchmarks =
