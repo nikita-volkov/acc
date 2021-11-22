@@ -59,7 +59,6 @@ instance Foldable Acc where
         foldMap f a
       EmptyAcc ->
         mempty
-#if MIN_VERSION_base(4,13,0)
   {-# INLINE [0] foldMap' #-}
   foldMap' f =
     \ case
@@ -67,7 +66,6 @@ instance Foldable Acc where
         foldMap' f a
       EmptyAcc ->
         mempty
-#endif
   {-# INLINE [0] foldr #-}
   foldr step acc =
     \ case

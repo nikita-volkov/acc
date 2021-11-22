@@ -35,7 +35,7 @@ library
     Acc.NeAcc.Def
     Acc.Prelude
   build-depends:
-    base >=4.11 && <5,
+    base >=4.13 && <5,
     deepseq >=1.4 && <1.5,
     semigroupoids >=5.3 && <6
 
