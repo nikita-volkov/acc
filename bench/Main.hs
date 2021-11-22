@@ -1,227 +1,58 @@
 module Main where
 
 import qualified Acc
-import Gauge
-import Gauge.Main
 import qualified Data.DList as DList
 import qualified Data.Foldable as Foldable
-import qualified Data.Sequence as Seq
+import qualified Data.Sequence as Sequence
 import qualified Data.Vector as Vector
+import Gauge
+import Gauge.Main
 import Prelude
 
 main =
   defaultMain
-    [ sumBgroup
-        "1"
-        (replicate 1000 1)
-        (foldMapToRight),
-      sumBgroup
-        "2"
-        (replicate 1000 1)
-        (foldMapToLeft),
-      sumBgroup
-        "sum/foldr',foldr'"
-        (Vector.fromList (replicate 100 (Vector.fromList (replicate @Int 100 1))))
-        (\singleton -> foldr' (\a b -> foldr' (mappend . singleton) mempty a <> b) mempty),
-      sumBgroup
-        "sum/foldl',foldl'"
-        (Vector.fromList (replicate 100 (Vector.fromList (replicate @Int 100 1))))
-        (\singleton -> foldl' (\a b -> a <> foldl' (\a -> mappend a . singleton) mempty b) mempty),
-      bgroup
-        "thousand-elements"
-        [ bgroup "foldl'" $
-            let !input =
-                  force $ enumFromTo 0 999 :: [Int]
-             in [ bench "Acc" $
-                    let work input =
-                          let acc =
-                                foldl' (<>) mempty $ fmap (pure @Acc.Acc) input
-                           in Foldable.toList acc
-                     in nf work input,
-                  bench "Seq" $
-                    let work input =
-                          let seq =
-                                foldl' (<>) mempty $ fmap Seq.singleton input
-                           in Foldable.toList seq
-                     in nf work input,
-                  bench "DList" $
-                    let work input =
-                          let seq =
-                                foldl' (<>) mempty $ fmap DList.singleton input
-                           in Foldable.toList seq
-                     in nf work input
-                ],
-          bgroup "foldr" $
-            let !input =
-                  force $ enumFromTo 0 999 :: [Int]
-             in [ bench "Acc" $
-                    let work input =
-                          let acc =
-                                foldr (<>) mempty $ fmap (pure @Acc.Acc) input
-                           in Foldable.toList acc
-                     in nf work input,
-                  bench "Seq" $
-                    let work input =
-                          let seq =
-                                foldr (<>) mempty $ fmap Seq.singleton input
-                           in Foldable.toList seq
-                     in nf work input,
-                  bench "DList" $
-                    let work input =
-                          let seq =
-                                foldr (<>) mempty $ fmap DList.singleton input
-                           in Foldable.toList seq
-                     in nf work input
-                ],
-          bgroup "foldr'" $
-            let !input =
-                  force $ enumFromTo 0 999 :: [Int]
-             in [ bench "Acc" $
-                    let work input =
-                          let acc =
-                                foldr' (<>) mempty $ fmap (pure @Acc.Acc) input
-                           in Foldable.toList acc
-                     in nf work input,
-                  bench "Seq" $
-                    let work input =
-                          let seq =
-                                foldr' (<>) mempty $ fmap Seq.singleton input
-                           in Foldable.toList seq
-                     in nf work input,
-                  bench "DList" $
-                    let work input =
-                          let seq =
-                                foldr' (<>) mempty $ fmap DList.singleton input
-                           in Foldable.toList seq
-                     in nf work input
-                ],
-          bgroup "foldr, force intermediate" $
-            let !input =
-                  force $ enumFromTo 0 999 :: [Int]
-             in [ bench "Acc" $
-                    let work input =
-                          let acc =
-                                foldr (<>) mempty $ fmap (pure @Acc.Acc) input
-                           in Foldable.toList $!! acc
-                     in nf work input,
-                  bench "Seq" $
-                    let work input =
-                          let seq =
-                                foldr (<>) mempty $ fmap Seq.singleton input
-                           in Foldable.toList $!! seq
-                     in nf work input,
-                  bench "DList" $
-                    let work input =
-                          let seq =
-                                foldr (<>) mempty $ fmap DList.singleton input
-                           in Foldable.toList $!! seq
-                     in nf work input
-                ],
-          bgroup "foldMap" $
-            let !input =
-                  force $ enumFromTo 0 999 :: [Int]
-             in [ bench "Acc" $
-                    let work input =
-                          let acc =
-                                foldMap (pure @Acc.Acc) input
-                           in Foldable.toList acc
-                     in nf work input,
-                  bench "Seq" $
-                    let work input =
-                          let seq =
-                                foldMap Seq.singleton input
-                           in Foldable.toList seq
-                     in nf work input,
-                  bench "DList" $
-                    let work input =
-                          let seq =
-                                foldMap DList.singleton input
-                           in Foldable.toList seq
-                     in nf work input
-                ],
-          bgroup "foldMap'" $
-            let !input =
-                  force $ enumFromTo 0 999 :: [Int]
-             in [ bench "Acc" $
-                    let work input =
-                          let acc =
-                                foldMap' (pure @Acc.Acc) input
-                           in Foldable.toList acc
-                     in nf work input,
-                  bench "Seq" $
-                    let work input =
-                          let seq =
-                                foldMap' Seq.singleton input
-                           in Foldable.toList seq
-                     in nf work input,
-                  bench "DList" $
-                    let work input =
-                          let seq =
-                                foldMap' DList.singleton input
-                           in Foldable.toList seq
-                     in nf work input
+    [ bgroup "sum" $
+        [ byMagnitudeUpTo "cons" 3 $ \size ->
+            let !input = force $ enumFromTo 0 size :: [Int]
+             in [ sumBench "acc" input sum $
+                    foldl' (flip Acc.cons) mempty,
+                  sumBench "list" input sum $
+                    foldl' (flip (:)) [],
+                  sumBench "dlist" input sum $
+                    foldl' (flip DList.cons) mempty,
+                  sumBench "sequence" input sum $
+                    foldl' (flip (Sequence.<|)) mempty
                 ]
-        ],
-      bgroup
-        "groups"
-        [ bgroup
-            "foldl'"
-            [ bench "acc" $
-                let input :: [Acc.Acc Int]
-                    !input =
-                      enumFromTo 0 99 & fmap pure
-                        & foldl' (<>) mempty
-                        & replicate 10
-                        & force
-                    work =
-                      Foldable.toList . foldl' (<>) mempty
-                 in nf work input,
-              bench "seq" $
-                let input :: [Seq Int]
-                    !input =
-                      enumFromTo 0 99 & fmap pure
-                        & foldl' (<>) mempty
-                        & replicate 10
-                        & force
-                    work =
-                      Foldable.toList . foldl' (<>) mempty
-                 in nf work input,
-              bench "dlist" $
-                let input :: [DList Int]
-                    !input =
-                      enumFromTo 0 99 & fmap pure
-                        & foldl' (<>) mempty
-                        & replicate 10
-                        & force
-                    work =
-                      Foldable.toList . foldl' (<>) mempty
-                 in nf work input
-            ]
         ]
     ]
 
-sumBgroup :: NFData input => String -> input -> (forall f. (Foldable f, Monoid (f Int)) => (Int -> f Int) -> input -> f Int) -> Benchmark
-sumBgroup name (force -> !input) build =
-  bgroup
-    name
-    [ sumBench "Acc" (pure @Acc.Acc),
-      sumBench "Seq" Seq.singleton,
-      sumBench "DList" DList.singleton,
-      sumBench "List" (pure @[])
-    ]
-  where
-    sumBench :: (Foldable f, Monoid (f Int)) => String -> (Int -> f Int) -> Benchmark
-    sumBench name singleton =
-      bench name (nf (Foldable.sum . build singleton) input)
+-- |
+-- Construct a benchmark that measures construction of the intermediate representation
+-- and folding using sum.
+--
+-- As a bonus,
+-- before benchmarking it ensures that the conversion is correct
+-- by using the input as the reference.
+{-# NOINLINE sumBench #-}
+sumBench ::
+  -- | Benchmark name.
+  String ->
+  -- | Input sample.
+  [Int] ->
+  -- | Reducer of the intermediate representation to sum.
+  (acc -> Int) ->
+  -- | Constructor of the intermediate representation.
+  ([Int] -> acc) ->
+  Benchmark
+sumBench name list reducer constructor =
+  if sum list == reducer (constructor list)
+    then bench name $ nf (reducer . constructor) list
+    else error $ "Conversion is incorrect on " <> name
 
--- | Best for Acc.
-{-# NOINLINE foldMapToRight #-}
-foldMapToRight :: Monoid m => (a -> m) -> [a] -> m
-foldMapToRight pure =
-  foldl' (\a b -> pure b <> a) mempty
+byMagnitudeUpTo :: String -> Int -> (Int -> [Benchmark]) -> Benchmark
+byMagnitudeUpTo groupName amount benchmarks =
+  bgroup groupName $
+    take amount sizesByMagnitude <&> \size -> bgroup (show size) (benchmarks size)
 
--- | Worst for Acc.
-{-# NOINLINE foldMapToLeft #-}
-foldMapToLeft :: Monoid m => (a -> m) -> [a] -> m
-foldMapToLeft pure =
-  foldl' (\a b -> a <> pure b) mempty
+sizesByMagnitude :: [Int]
+sizesByMagnitude = [0 ..] <&> \magnitude -> 10 ^ (2 * magnitude)
