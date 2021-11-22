@@ -22,6 +22,15 @@ main =
                     foldl' (flip DList.cons) mempty,
                   sumBench "sequence" input sum $
                     foldl' (flip (Sequence.<|)) mempty
+                ],
+          byMagnitudeUpTo "snoc" 3 $ \size ->
+            let !input = force $ enumFromTo 0 size :: [Int]
+             in [ sumBench "acc" input sum $
+                    foldl' (flip Acc.snoc) mempty,
+                  sumBench "dlist" input sum $
+                    foldl' DList.snoc mempty,
+                  sumBench "sequence" input sum $
+                    foldl' (Sequence.|>) mempty
                 ]
         ]
     ]
