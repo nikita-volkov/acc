@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 module Acc.NeAcc.Def
   ( NeAcc (..),
     foldM,
@@ -146,7 +144,6 @@ instance Foldable NeAcc where
           Leaf a ->
             map a <> peel buff
 
-#if MIN_VERSION_base(4,13,0)
   {-# INLINE [0] foldMap' #-}
   foldMap' :: Monoid m => (a -> m) -> NeAcc a -> m
   foldMap' =
@@ -154,7 +151,7 @@ instance Foldable NeAcc where
     where
       foldMapTo' :: Monoid m => m -> (a -> m) -> NeAcc a -> m
       foldMapTo' !acc map =
-        \ case
+        \case
           Branch a b -> foldMapToOnBranch' acc map a b
           Leaf a -> acc <> map a
       foldMapToOnBranch' :: Monoid m => m -> (a -> m) -> NeAcc a -> NeAcc a -> m
@@ -162,7 +159,6 @@ instance Foldable NeAcc where
         case a of
           Leaf c -> foldMapTo' (acc <> map c) map b
           Branch c d -> foldMapToOnBranch' acc map c (Branch d b)
-#endif
 
 instance Traversable NeAcc where
   {-# INLINE [0] traverse #-}

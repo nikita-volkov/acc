@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 module Acc
   ( Acc,
     cons,
