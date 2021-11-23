@@ -31,6 +31,12 @@ main =
                 foldl' DList.snoc mempty,
               reduceConstructBench "sequence" input sum $
                 foldl' (Sequence.|>) mempty
+            ],
+          onIntListByMagBench "fromList" 3 $ \input ->
+            [ reduceConstructBench "acc" input sum $ fromList @(Acc.Acc Int),
+              reduceConstructBench "list" input sum $ id,
+              reduceConstructBench "dlist" input sum $ DList.fromList,
+              reduceConstructBench "sequence" input sum $ Sequence.fromList
             ]
         ],
       bgroup "length" $
