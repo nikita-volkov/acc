@@ -21,4 +21,4 @@ build \
 --ghc-options "-O2 -threaded" \
 --bench \
 --ba "$ba" \
-acc:bench
+:bench
