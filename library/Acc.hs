@@ -1,5 +1,6 @@
 module Acc
   ( Acc,
+    fromReverseList,
     cons,
     snoc,
     uncons,
@@ -21,7 +22,7 @@ import qualified Data.Semigroup.Foldable as Foldable1
 -- Useful for implementing all kinds of builders on top.
 --
 -- Appending and prepending is always \(\mathcal{O}(1)\).
--- 
+--
 -- Another way to think about this data-structure
 -- is as of a strict list with fast append and snoc.
 --
@@ -155,10 +156,7 @@ instance Monoid (Acc a) where
 instance IsList (Acc a) where
   type Item (Acc a) = a
   {-# INLINE [0] fromList #-}
-  fromList list =
-    case reverse list of
-      a : b -> TreeAcc (NeAcc.prependReverseList b (NeAcc.Leaf a))
-      _ -> EmptyAcc
+  fromList = fromReverseList . reverse
   {-# INLINE [0] toList #-}
   toList =
     \case
@@ -263,3 +261,14 @@ enumFromTo from to =
   if from <= to
     then TreeAcc (NeAcc.appendEnumFromTo (succ from) to (NeAcc.Leaf from))
     else EmptyAcc
+
+-- |
+-- Construct from list in reverse order.
+--
+-- This is more efficient than 'fromList',
+-- which is actually defined as @fromReverseList . 'reverse'@.
+{-# INLINE fromReverseList #-}
+fromReverseList :: [a] -> Acc a
+fromReverseList = \case
+  a : b -> TreeAcc (NeAcc.prependReverseList b (NeAcc.Leaf a))
+  _ -> EmptyAcc
