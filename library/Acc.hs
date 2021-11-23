@@ -185,8 +185,7 @@ cons a =
 --
 -- The produced accumulator will lack the extracted element
 -- and will have the underlying tree rebalanced towards the beginning.
--- This means that calling 'uncons' on it will be \(\mathcal{O}(1)\) and
--- 'unsnoc' will be \(\mathcal{O}(n)\).
+-- This means that calling 'uncons' on it will be \(\mathcal{O}(1)\).
 {-# INLINE uncons #-}
 uncons :: Acc a -> Maybe (a, Acc a)
 uncons =
