@@ -32,6 +32,7 @@ library
     Acc
     Acc.NeAcc
   other-modules:
+    Acc.Balance
     Acc.NeAcc.Def
     Acc.Prelude
   build-depends:
