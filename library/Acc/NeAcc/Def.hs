@@ -18,7 +18,7 @@ import qualified Acc.Prelude as Prelude
 --
 -- Relates to 'Acc.Acc' the same way as 'NonEmpty' to list.
 data NeAcc a
-  = Leaf !a
+  = Leaf a
   | Branch !(NeAcc a) !(NeAcc a)
   deriving (Generic, Generic1)
 
