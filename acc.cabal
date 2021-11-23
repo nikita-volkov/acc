@@ -30,6 +30,7 @@ library
   default-language: Haskell2010
   exposed-modules:
     Acc
+    Acc.Acc2
     Acc.NeAcc
   other-modules:
     Acc.Balance
