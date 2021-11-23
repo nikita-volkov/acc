@@ -76,7 +76,7 @@ sequence          7.209 ms
 
 ---
 
-For complete results see [the dump](bench-results).
+For complete results see [the log](bench-results).
 
 _Executed on an AWS c6i.2xlarge instance running Ubuntu._
 
