@@ -21,6 +21,9 @@ import qualified Data.Semigroup.Foldable as Foldable1
 -- Useful for implementing all kinds of builders on top.
 --
 -- Appending and prepending is always \(\mathcal{O}(1)\).
+-- 
+-- Another way to think about this data-structure
+-- is as of a strict list with fast append and snoc.
 --
 -- To produce a single element 'Acc' use 'pure'.
 -- To produce a multielement 'Acc' use 'fromList'.
