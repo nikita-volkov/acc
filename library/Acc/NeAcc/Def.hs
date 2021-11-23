@@ -160,17 +160,6 @@ instance Foldable NeAcc where
           Leaf c -> foldMapTo' (acc <> map c) map b
           Branch c d -> foldMapToOnBranch' acc map c (Branch d b)
 
-  length :: NeAcc a -> Int
-  length =
-    buildAndReduceStack 0 []
-    where
-      buildAndReduceStack !n stack = \case
-        Leaf _ -> case stack of
-          tree : stackTail -> case succ n of
-            n -> buildAndReduceStack n stackTail tree
-          [] -> n
-        Branch l r -> buildAndReduceStack n (r : stack) l
-
 instance Traversable NeAcc where
   {-# INLINE [0] traverse #-}
   traverse :: Applicative f => (a -> f b) -> NeAcc a -> f (NeAcc b)
