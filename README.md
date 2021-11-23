@@ -22,8 +22,8 @@ as used for aggregation with intent of reduction.
 
 In other words a two-step process of the following structure is measured as a whole:
 
-1. Construct the measured data-structure using a particular method (cons, snoc, fromList)
-2. Fold the data-structure into a final result (sum, length)
+1. Construct the measured data-structure using a particular method (`cons`, `snoc`, `fromList`)
+2. Fold the data-structure into a final result (`sum`, `length`)
 
 Following are the highlights from the benchmark results
 grouped by the method of construction of the datastructure.
