@@ -2,4 +2,4 @@
 set -eo pipefail
 
 ./format.bash
-./bench.bash
+./typecheck.bash
