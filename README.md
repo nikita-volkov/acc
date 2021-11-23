@@ -5,12 +5,10 @@ for later traversal or folding.
 A great basis for implementing many custom monoids,
 most notably of the Builder pattern.
 
-`Acc` shines with its `Monoid` instance performance,
-which relieves the user from caring about from which side to append.
-This is important because,
-different data-structures exhibit very different performance depending on that.
-Most notably `[]` (`Data.List`).
-`Acc` on the other hand is neutral and performs well in all scenarios.
+Different data-structures exhibit very different performance in (`cons`, `snoc`, pre/post `append`).
+Most notorious in it is `[]` (`Data.List`), which has only fast `cons`, does traversal to do `append` & does not have `snoc`.
+
+`Acc` performs well in all scenarios of construction, as it is designed to shine in its `Monoid` instance performance, and because both of design & performance `Acc` allows to use any combinations of (`cons`, `snoc`, pre/post `append`) during construction & still be currently the fastest in monoidal construction.
 
 For such purposes it is common to use `Seq` or `DList`.
 The benchmark results below show that `Acc` is a better fit.
@@ -87,4 +85,4 @@ Given the preconditions of the benchmarks, the following can be concluded:
 - Neither `[]` or `DList` are suitable as monoidal structures, due to exponential performance degradation on appends from both sides
 - Snocing and even consing `Acc` is better than all alternatives
 - `Acc` performs better than `Seq` on both left- and right-appends (2-3x)
-- `Seq` gets constructed from list faster than `Acc` (1.5x)
+- `Seq` gets constructed from `List` faster than `Acc` (1.5x)
