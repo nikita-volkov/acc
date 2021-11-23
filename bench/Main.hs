@@ -35,6 +35,22 @@ main =
               reduceConstructBench "list" input sum $ id,
               reduceConstructBench "dlist" input sum $ DList.fromList,
               reduceConstructBench "sequence" input sum $ Sequence.fromList
+            ],
+          bgroup "append" $
+            [ bgroup "left" $
+                onIntListByMagBenchList 3 $ \elementList ->
+                  onSizeByMagBenchList 3 $ \appendAmount ->
+                    let appendLeftBench :: (Foldable f, NFData (f Int), Monoid (f Int)) => String -> ([Int] -> f Int) -> Benchmark
+                        appendLeftBench name constructChunk =
+                          let input =
+                                replicate appendAmount (constructChunk elementList)
+                           in reduceConstructBench name input sum $
+                                foldl' (flip (<>)) mempty
+                     in [ appendLeftBench "acc" $ fromList @(Acc.Acc Int),
+                          appendLeftBench "list" $ id,
+                          appendLeftBench "dlist" $ DList.fromList,
+                          appendLeftBench "sequence" $ Sequence.fromList
+                        ]
             ]
         ],
       bgroup "length" $
@@ -56,7 +72,7 @@ main =
 -- and reduction, ensuring that they don't get fused.
 {-# NOINLINE reduceConstructBench #-}
 reduceConstructBench ::
-  NFData reduction =>
+  (NFData reduction, NFData a) =>
   -- | Benchmark name.
   String ->
   -- | Input sample.
@@ -67,7 +83,7 @@ reduceConstructBench ::
   ([a] -> intermediate) ->
   Benchmark
 reduceConstructBench name list reducer constructor =
-  bench name $ nf (reducer . constructor) list
+  bench name $ nf (reducer . constructor) $!! list
 
 onIntListByMagBench :: String -> Int -> ([Int] -> [Benchmark]) -> Benchmark
 onIntListByMagBench groupName amount benchmarks =
@@ -76,8 +92,16 @@ onIntListByMagBench groupName amount benchmarks =
 
 onSizeByMagBench :: String -> Int -> (Int -> [Benchmark]) -> Benchmark
 onSizeByMagBench groupName amount benchmarks =
-  bgroup groupName $
-    take amount sizesByMagnitude <&> \size -> bgroup (show size) (benchmarks size)
+  bgroup groupName $ onSizeByMagBenchList amount benchmarks
+
+onIntListByMagBenchList :: Int -> ([Int] -> [Benchmark]) -> [Benchmark]
+onIntListByMagBenchList amount benchmarks =
+  onSizeByMagBenchList amount $ \size ->
+    benchmarks $!! enumFromTo 0 size
+
+onSizeByMagBenchList :: Int -> (Int -> [Benchmark]) -> [Benchmark]
+onSizeByMagBenchList amount benchmarks =
+  take amount sizesByMagnitude <&> \size -> bgroup (show size) (benchmarks size)
 
 sizesByMagnitude :: [Int]
 sizesByMagnitude = [0 ..] <&> \magnitude -> 10 ^ (2 * magnitude)
