@@ -1,7 +1,7 @@
 module Acc.NeAcc.Def
   ( NeAcc (..),
     foldM,
-    fromList1,
+    prependReverseList,
     uncons,
     unconsTo,
     unsnoc,
@@ -33,9 +33,9 @@ instance NFData1 NeAcc
 instance IsList (NeAcc a) where
   type Item (NeAcc a) = a
   {-# INLINE [0] fromList #-}
-  fromList =
-    \case
-      a : b -> fromList1 a b
+  fromList list =
+    case reverse list of
+      a : b -> prependReverseList b (Leaf a)
       _ -> error "Empty input list"
   {-# INLINE [0] toList #-}
   toList =
@@ -277,17 +277,11 @@ foldM step !acc =
         Leaf c -> step acc c >>= \acc' -> foldM step acc' b
         Branch c d -> foldMOnBranch step acc c (Branch d b)
 
-fromList1 :: a -> [a] -> NeAcc a
-fromList1 a =
-  \case
-    b : c -> fromList1To (Leaf a) b c
-    _ -> Leaf a
-
-fromList1To :: NeAcc a -> a -> [a] -> NeAcc a
-fromList1To leftTree a =
-  \case
-    b : c -> fromList1To (Branch leftTree (Leaf a)) b c
-    _ -> Branch leftTree (Leaf a)
+prependReverseList :: [a] -> NeAcc a -> NeAcc a
+prependReverseList list tree =
+  case list of
+    head : tail -> prependReverseList tail (Branch (Leaf head) tree)
+    _ -> tree
 
 {-# INLINE uncons #-}
 uncons :: NeAcc a -> (a, Maybe (NeAcc a))

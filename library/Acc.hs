@@ -148,9 +148,9 @@ instance Monoid (Acc a) where
 instance IsList (Acc a) where
   type Item (Acc a) = a
   {-# INLINE [0] fromList #-}
-  fromList =
-    \case
-      a : b -> TreeAcc (NeAcc.fromList1 a b)
+  fromList list =
+    case reverse list of
+      a : b -> TreeAcc (NeAcc.prependReverseList b (NeAcc.Leaf a))
       _ -> EmptyAcc
   {-# INLINE [0] toList #-}
   toList =
