@@ -38,19 +38,13 @@ main =
             ],
           bgroup "append" $
             [ bgroup "left" $
-                onIntListByMagBenchList 3 $ \elementList ->
+                onIntListByMagBenchList 3 $ \input ->
                   onSizeByMagBenchList 3 $ \appendAmount ->
-                    let appendLeftBench :: (Foldable f, NFData (f Int), Monoid (f Int)) => String -> ([Int] -> f Int) -> Benchmark
-                        appendLeftBench name constructChunk =
-                          let input =
-                                replicate appendAmount (constructChunk elementList)
-                           in reduceConstructBench name input sum $
-                                foldl' (flip (<>)) mempty
-                     in [ appendLeftBench "acc" $ fromList @(Acc.Acc Int),
-                          appendLeftBench "list" $ id,
-                          appendLeftBench "dlist" $ DList.fromList,
-                          appendLeftBench "sequence" $ Sequence.fromList
-                        ]
+                    [ appendLeftBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
+                      appendLeftBench "list" appendAmount input sum,
+                      appendLeftBench "dlist" appendAmount (DList.fromList input) sum,
+                      appendLeftBench "sequence" appendAmount (Sequence.fromList input) sum
+                    ]
             ]
         ],
       bgroup "length" $
@@ -84,6 +78,27 @@ reduceConstructBench ::
   Benchmark
 reduceConstructBench name list reducer constructor =
   bench name $ nf (reducer . constructor) $!! list
+
+-- |
+-- Construct a benchmark that measures appending from the left side of a
+-- preconstructed chunk of an intermediate representation.
+{-# NOINLINE appendLeftBench #-}
+appendLeftBench ::
+  (NFData reduction, NFData intermediate, Monoid intermediate) =>
+  -- | Benchmark name.
+  String ->
+  -- | How many appends.
+  Int ->
+  -- | Sample intermediate representation.
+  intermediate ->
+  -- | Reducer of the intermediate representation.
+  (intermediate -> reduction) ->
+  Benchmark
+appendLeftBench name appendAmount chunk reducer =
+  let input =
+        replicate appendAmount chunk
+   in reduceConstructBench name input reducer $
+        foldl' (flip (<>)) mempty
 
 onIntListByMagBench :: String -> Int -> ([Int] -> [Benchmark]) -> Benchmark
 onIntListByMagBench groupName amount benchmarks =
