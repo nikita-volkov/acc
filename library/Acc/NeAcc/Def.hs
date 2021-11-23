@@ -164,7 +164,7 @@ instance Foldable NeAcc where
   length =
     buildAndReduceStack 0 []
     where
-      buildAndReduceStack n stack = \case
+      buildAndReduceStack !n stack = \case
         Leaf _ -> case stack of
           tree : stackTail -> case succ n of
             n -> buildAndReduceStack n stackTail tree
