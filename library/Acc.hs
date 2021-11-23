@@ -3,7 +3,6 @@ module Acc
     cons,
     snoc,
     uncons,
-    unsnoc,
     toNonEmpty,
     toNeAcc,
     enumFromTo,
