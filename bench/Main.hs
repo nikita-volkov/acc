@@ -38,16 +38,16 @@ main =
             ],
           bgroup "append" $
             [ bgroup "left" $
-                onSizeByMagBenchList 4 $ \appendAmount ->
-                  onIntListByMagBenchList 4 $ \input ->
+                onIntListByMagBenchList 4 $ \input ->
+                  onSizeByMagBenchList 4 $ \appendAmount ->
                     [ appendLeftBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
                       appendLeftBench "list" appendAmount input sum,
                       appendLeftBench "dlist" appendAmount (DList.fromList input) sum,
                       appendLeftBench "sequence" appendAmount (Sequence.fromList input) sum
                     ],
               bgroup "right" $
-                onSizeByMagBenchList 4 $ \appendAmount ->
-                  onIntListByMagBenchList 4 $ \input ->
+                onIntListByMagBenchList 4 $ \input ->
+                  onSizeByMagBenchList 4 $ \appendAmount ->
                     [ appendRightBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
                       appendRightBench "list" appendAmount input sum,
                       appendRightBench "dlist" appendAmount (DList.fromList input) sum,
