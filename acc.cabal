@@ -30,13 +30,10 @@ library
   default-language: Haskell2010
   exposed-modules:
     Acc
-    Acc.Acc2
     Acc.NeAcc
   other-modules:
-    Acc.Balance
     Acc.NeAcc.Def
     Acc.Prelude
-    Acc.Tree
   build-depends:
     base >=4.13 && <5,
     deepseq >=1.4 && <1.5,
