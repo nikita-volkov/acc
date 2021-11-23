@@ -44,6 +44,14 @@ main =
                       appendLeftBench "list" appendAmount input sum,
                       appendLeftBench "dlist" appendAmount (DList.fromList input) sum,
                       appendLeftBench "sequence" appendAmount (Sequence.fromList input) sum
+                    ],
+              bgroup "right" $
+                onIntListByMagBenchList 3 $ \input ->
+                  onSizeByMagBenchList 3 $ \appendAmount ->
+                    [ appendRightBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
+                      appendRightBench "list" appendAmount input sum,
+                      appendRightBench "dlist" appendAmount (DList.fromList input) sum,
+                      appendRightBench "sequence" appendAmount (Sequence.fromList input) sum
                     ]
             ]
         ],
@@ -99,6 +107,27 @@ appendLeftBench name appendAmount chunk reducer =
         replicate appendAmount chunk
    in reduceConstructBench name input reducer $
         foldl' (flip (<>)) mempty
+
+-- |
+-- Construct a benchmark that measures appending from the right side of a
+-- preconstructed chunk of an intermediate representation.
+{-# NOINLINE appendRightBench #-}
+appendRightBench ::
+  (NFData reduction, NFData intermediate, Monoid intermediate) =>
+  -- | Benchmark name.
+  String ->
+  -- | How many appends.
+  Int ->
+  -- | Sample intermediate representation.
+  intermediate ->
+  -- | Reducer of the intermediate representation.
+  (intermediate -> reduction) ->
+  Benchmark
+appendRightBench name appendAmount chunk reducer =
+  let input =
+        replicate appendAmount chunk
+   in reduceConstructBench name input reducer $
+        foldl' (<>) mempty
 
 onIntListByMagBench :: String -> Int -> ([Int] -> [Benchmark]) -> Benchmark
 onIntListByMagBench groupName amount benchmarks =
