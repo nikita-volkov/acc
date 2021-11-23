@@ -35,6 +35,7 @@ library
     Acc.Balance
     Acc.NeAcc.Def
     Acc.Prelude
+    Acc.Tree
   build-depends:
     base >=4.13 && <5,
     deepseq >=1.4 && <1.5,
