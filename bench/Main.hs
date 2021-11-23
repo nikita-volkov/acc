@@ -25,8 +25,6 @@ main =
           onIntListByMagBench "snoc" 3 $ \input ->
             [ reduceConstructBench "acc" input sum $
                 foldl' (flip Acc.snoc) mempty,
-              reduceConstructBench "list" input sum $
-                foldl' (\list a -> list <> [a]) mempty,
               reduceConstructBench "dlist" input sum $
                 foldl' DList.snoc mempty,
               reduceConstructBench "sequence" input sum $
