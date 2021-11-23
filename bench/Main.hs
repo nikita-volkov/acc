@@ -12,7 +12,7 @@ import Prelude
 main =
   defaultMain
     [ bgroup "sum" $
-        [ onIntListByMagBench "cons" 3 $ \input ->
+        [ onIntListByMagBench "cons" 4 $ \input ->
             [ reduceConstructBench "acc" input sum $
                 foldl' (flip Acc.cons) mempty,
               reduceConstructBench "list" input sum $
@@ -22,7 +22,7 @@ main =
               reduceConstructBench "sequence" input sum $
                 foldl' (flip (Sequence.<|)) mempty
             ],
-          onIntListByMagBench "snoc" 3 $ \input ->
+          onIntListByMagBench "snoc" 4 $ \input ->
             [ reduceConstructBench "acc" input sum $
                 foldl' (flip Acc.snoc) mempty,
               reduceConstructBench "dlist" input sum $
@@ -30,7 +30,7 @@ main =
               reduceConstructBench "sequence" input sum $
                 foldl' (Sequence.|>) mempty
             ],
-          onIntListByMagBench "fromList" 3 $ \input ->
+          onIntListByMagBench "fromList" 4 $ \input ->
             [ reduceConstructBench "acc" input sum $ fromList @(Acc.Acc Int),
               reduceConstructBench "list" input sum $ id,
               reduceConstructBench "dlist" input sum $ DList.fromList,
@@ -38,16 +38,16 @@ main =
             ],
           bgroup "append" $
             [ bgroup "left" $
-                onSizeByMagBenchList 3 $ \appendAmount ->
-                  onIntListByMagBenchList 3 $ \input ->
+                onSizeByMagBenchList 4 $ \appendAmount ->
+                  onIntListByMagBenchList 4 $ \input ->
                     [ appendLeftBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
                       appendLeftBench "list" appendAmount input sum,
                       appendLeftBench "dlist" appendAmount (DList.fromList input) sum,
                       appendLeftBench "sequence" appendAmount (Sequence.fromList input) sum
                     ],
               bgroup "right" $
-                onSizeByMagBenchList 3 $ \appendAmount ->
-                  onIntListByMagBenchList 3 $ \input ->
+                onSizeByMagBenchList 4 $ \appendAmount ->
+                  onIntListByMagBenchList 4 $ \input ->
                     [ appendRightBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
                       appendRightBench "list" appendAmount input sum,
                       appendRightBench "dlist" appendAmount (DList.fromList input) sum,
@@ -56,7 +56,7 @@ main =
             ]
         ],
       bgroup "length" $
-        [ onIntListByMagBench "cons" 3 $ \input ->
+        [ onIntListByMagBench "cons" 4 $ \input ->
             [ reduceConstructBench "acc" input length $
                 foldl' (flip Acc.cons) mempty,
               reduceConstructBench "list" input length $
