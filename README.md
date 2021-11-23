@@ -22,23 +22,69 @@ as used for aggregation with intent of reduction.
 
 In other words a two-step process of the following structure is measured as a whole:
 
-1. Construct the measured data-structure of from data of a given size using cons or snoc or fromList
-2. Fold the data-structure using sum or length
+1. Construct the measured data-structure using a particular method (cons, snoc, fromList)
+2. Fold the data-structure into a final result (sum, length)
+
+Following are the highlights from the benchmark results
+grouped by the method of construction of the datastructure.
+
+### Consing 1000 elements
 
 ```
-sum/cons/10000/acc                       402.9 μs
-sum/cons/10000/list                      598.8 μs
-sum/cons/10000/dlist                     1.088 ms
-sum/cons/10000/sequence                  872.6 μs
-sum/snoc/10000/acc                       604.2 μs
-sum/snoc/10000/dlist                     846.6 μs
-sum/snoc/10000/sequence                  876.6 μs
-sum/fromList/10000/acc                   494.7 μs
-sum/fromList/10000/list                  426.5 μs
-sum/fromList/10000/dlist                 626.2 μs
-sum/fromList/10000/sequence              187.6 μs
-length/cons/10000/acc                    399.6 μs
-length/cons/10000/list                   128.5 μs
-length/cons/10000/dlist                  546.7 μs
-length/cons/10000/sequence               790.3 μs
+acc               12.40 μs
+list              18.70 μs
+dlist             43.95 μs
+sequence          27.54 μs
 ```
+
+### Snocing 1000 elements
+
+```
+acc               17.02 μs
+dlist             38.93 μs
+sequence          27.15 μs
+```
+
+_No List here because it will blow up the memory._
+
+### Construction from a list of 1000 elements
+
+```
+acc               13.27 μs
+list              12.97 μs
+dlist             27.57 μs
+sequence          10.70 μs
+```
+
+### Appending chunks of 1000 elements 1000 times from left
+
+```
+acc               4.256 ms
+list              553.7 ms
+dlist             315.9 ms
+sequence          10.05 ms
+```
+
+### Appending chunks of 1000 elements 1000 times from right
+
+```
+acc               4.305 ms
+list              5.126 s
+dlist             360.4 ms
+sequence          7.209 ms
+```
+
+---
+
+For complete results see [the dump](bench-results).
+
+_Executed on an AWS c6i.2xlarge instance running Ubuntu._
+
+## Conclusions
+
+Given the preconditions of the benchmarks, the following can be concluded:
+
+- Neither List or DList are suitable as monoidal structures, due to exponential performance degradation on appends from both sides
+- Snocing and even consing Acc is better than all alternatives
+- Acc performs better than Seq on both left- and right-appends (2-3x)
+- Seq gets constructed from list faster than Acc (1.5x)
