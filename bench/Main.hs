@@ -148,4 +148,4 @@ onSizeByMagBenchList amount benchmarks =
   take amount sizesByMagnitude <&> \size -> bgroup (show size) (benchmarks size)
 
 sizesByMagnitude :: [Int]
-sizesByMagnitude = [0 ..] <&> \magnitude -> 10 ^ (2 * magnitude)
+sizesByMagnitude = [0 ..] <&> \magnitude -> 10 ^ magnitude
