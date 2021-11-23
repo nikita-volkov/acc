@@ -20,15 +20,22 @@ import qualified Acc.Prelude as Prelude
 data NeAcc a
   = Leaf a
   | Branch !(NeAcc a) !(NeAcc a)
-  deriving (Generic, Generic1)
 
 instance Show a => Show (NeAcc a) where
   show =
     show . toList
 
-instance NFData a => NFData (NeAcc a)
+instance NFData a => NFData (NeAcc a) where
+  rnf = \case
+    Leaf a -> rnf a
+    Branch l r -> seq (rnf l) (rnf r)
 
-instance NFData1 NeAcc
+instance NFData1 NeAcc where
+  liftRnf rnfLeaf = rnfTree
+    where
+      rnfTree = \case
+        Leaf a -> rnfLeaf a
+        Branch l r -> seq (rnfTree l) (rnfTree r)
 
 instance IsList (NeAcc a) where
   type Item (NeAcc a) = a

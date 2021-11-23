@@ -38,11 +38,16 @@ import qualified Data.Semigroup.Foldable as Foldable1
 data Acc a
   = EmptyAcc
   | TreeAcc !(NeAcc.NeAcc a)
-  deriving (Generic, Generic1)
 
-instance NFData a => NFData (Acc a)
+instance NFData a => NFData (Acc a) where
+  rnf = \case
+    TreeAcc tree -> rnf tree
+    EmptyAcc -> ()
 
-instance NFData1 Acc
+instance NFData1 Acc where
+  liftRnf rnfLeaf = \case
+    TreeAcc tree -> liftRnf rnfLeaf tree
+    EmptyAcc -> ()
 
 deriving instance Functor Acc
 
