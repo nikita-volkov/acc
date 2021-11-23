@@ -118,20 +118,13 @@ instance Foldable NeAcc where
 
   {-# INLINE [0] foldl' #-}
   foldl' :: (b -> a -> b) -> b -> NeAcc a -> b
-  foldl' step !acc =
-    \case
-      Branch a b ->
-        foldlOnBranch' step acc a b
-      Leaf a ->
-        step acc a
+  foldl' step = build []
     where
-      foldlOnBranch' :: (b -> a -> b) -> b -> NeAcc a -> NeAcc a -> b
-      foldlOnBranch' step acc a b =
-        case a of
-          Leaf c ->
-            foldl' step (step acc c) b
-          Branch c d ->
-            foldlOnBranch' step acc c (Branch d b)
+      build stack !acc = \case
+        Branch l r -> build (r : stack) acc l
+        Leaf leaf -> case stack of
+          tree : stack -> build stack (step acc leaf) tree
+          _ -> step acc leaf
 
   {-# INLINE [0] foldMap #-}
   foldMap :: Monoid m => (a -> m) -> NeAcc a -> m
