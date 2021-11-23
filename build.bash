@@ -2,4 +2,4 @@
 set -eo pipefail
 
 ./format.bash
-./typecheck.bash
+./bench.bash 10000

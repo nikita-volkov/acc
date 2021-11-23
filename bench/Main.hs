@@ -7,6 +7,7 @@ import qualified Data.Sequence as Sequence
 import qualified Data.Vector as Vector
 import Gauge
 import Gauge.Main
+import qualified StrictList
 import Prelude
 
 main =
@@ -17,6 +18,8 @@ main =
                 foldl' (flip Acc.cons) mempty,
               reduceConstructBench "list" input sum $
                 foldl' (flip (:)) [],
+              reduceConstructBench "strict-list" input sum $
+                foldl' (flip StrictList.Cons) StrictList.Nil,
               reduceConstructBench "dlist" input sum $
                 foldl' (flip DList.cons) mempty,
               reduceConstructBench "sequence" input sum $
@@ -33,6 +36,7 @@ main =
           onIntListByMagBench "fromList" 3 $ \input ->
             [ reduceConstructBench "acc" input sum $ fromList @(Acc.Acc Int),
               reduceConstructBench "list" input sum $ id,
+              reduceConstructBench "strict-list" input sum $ fromList @(StrictList.List Int),
               reduceConstructBench "dlist" input sum $ DList.fromList,
               reduceConstructBench "sequence" input sum $ Sequence.fromList
             ]
@@ -43,6 +47,8 @@ main =
                 foldl' (flip Acc.cons) mempty,
               reduceConstructBench "list" input length $
                 foldl' (flip (:)) [],
+              reduceConstructBench "strict-list" input length $
+                foldl' (flip StrictList.Cons) StrictList.Nil,
               reduceConstructBench "dlist" input length $
                 foldl' (flip DList.cons) mempty,
               reduceConstructBench "sequence" input length $

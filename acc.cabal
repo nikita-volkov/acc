@@ -54,6 +54,7 @@ benchmark bench
   build-depends:
     acc,
     gauge >=0.2.5 && <0.3,
+    strict-list >=0.1.6 && <0.7,
     rerebase >=1.9 && <2
 
 test-suite test
