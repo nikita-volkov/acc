@@ -25,4 +25,4 @@ build \
 --ghc-options "-j6 +RTS -A128m -n2m -RTS" \
 --test \
 --ta "$test_args" \
-$([ -n "$target" ] && echo "acc:$target")
+$([ -n "$target" ] && echo ":$target")
