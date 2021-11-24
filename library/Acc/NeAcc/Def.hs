@@ -65,21 +65,14 @@ instance Applicative NeAcc where
 instance Foldable NeAcc where
   {-# INLINEABLE [0] foldr #-}
   foldr :: (a -> b -> b) -> b -> NeAcc a -> b
-  foldr step acc =
-    peel []
+  foldr step =
+    go []
     where
-      peel layers =
-        \case
-          Leaf a ->
-            step a (unpeel layers)
-          Branch l r ->
-            peel (r : layers) l
-      unpeel =
-        \case
-          h : t ->
-            peel t h
-          _ ->
-            acc
+      go stack next = \case
+        Branch l r -> go (r : stack) next l
+        Leaf a -> step a $ case stack of
+          tree : stack -> go stack next tree
+          [] -> next
 
   {-# INLINE [0] foldr' #-}
   foldr' :: (a -> b -> b) -> b -> NeAcc a -> b
