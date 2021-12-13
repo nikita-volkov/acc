@@ -5,25 +5,25 @@ for later traversal or folding.
 A great basis for implementing many custom monoids,
 most notably of the Builder pattern.
 
-It shines with its Monoid instance,
+It shines with its `Monoid` instance,
 which relieves the user from caring about from which side to append.
 This is important because,
 different data-structures exhibit very different performance depending on that.
-Most notably List.
-Acc on the other hand is neutral and performs well in all scenarios.
+Most notably linked list.
+`Acc` on the other hand is neutral and performs well in all scenarios.
 
-For such purposes it is common to use Seq or DList.
-The benchmark results below show that Acc is a better fit.
+For such purposes it is common to use `Seq` or `DList`.
+The benchmark results below show that `Acc` is a better fit.
 
 # Benchmark results
 
-These benchmarks compare the performance of acc vs. various other structures
+These benchmarks compare the performance of `Acc` vs. various other structures
 as used for aggregation with intent of reduction.
 
 In other words a two-step process of the following structure is measured as a whole:
 
-1. Construct the measured data-structure using a particular method (cons, snoc, fromList)
-2. Fold the data-structure into a final result (sum, length)
+1. Construct the measured data-structure using a particular method (`cons`, `snoc`, `fromList`)
+2. Fold the data-structure into a final result (`sum`, `length`)
 
 Following are the highlights from the benchmark results
 grouped by the method of construction of the datastructure.
@@ -45,7 +45,7 @@ dlist             38.93 μs
 sequence          27.15 μs
 ```
 
-_No List here because it will blow up the memory._
+_No list here because it will blow up the memory._
 
 ### Construction from a list of 1000 elements
 
@@ -84,7 +84,7 @@ _Executed on an AWS c6i.2xlarge instance running Ubuntu._
 
 Given the preconditions of the benchmarks, the following can be concluded:
 
-- Neither List or DList are suitable as monoidal structures, due to exponential performance degradation on appends from both sides
-- Snocing and even consing Acc is better than all alternatives
-- Acc performs better than Seq on both left- and right-appends (2-3x)
-- Seq gets constructed from list faster than Acc (1.5x)
+- Neither list or `DList` are suitable as monoidal structures, due to exponential performance degradation on appends from both sides
+- Snocing and even consing `Acc` is better than all alternatives
+- `Acc` performs better than `Seq` on both left- and right-appends (2-3x)
+- `Seq` gets constructed from list faster than `Acc` (1.5x)
