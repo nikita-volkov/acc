@@ -45,7 +45,7 @@ dlist             38.93 μs
 sequence          27.15 μs
 ```
 
-_No List here because it will blow up the memory._
+_No list here because it will blow up the memory._
 
 ### Construction from a list of 1000 elements
 
@@ -87,4 +87,4 @@ Given the preconditions of the benchmarks, the following can be concluded:
 - Neither `[]` or `DList` are suitable as monoidal structures, due to exponential performance degradation on appends from both sides
 - Snocing and even consing `Acc` is better than all alternatives
 - `Acc` performs better than `Seq` on both left- and right-appends (2-3x)
-- `Seq` gets constructed from `List` faster than `Acc` (1.5x)
+- `Seq` gets constructed from `[]` faster than `Acc` (1.5x)
