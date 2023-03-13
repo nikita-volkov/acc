@@ -39,8 +39,8 @@ library
     Acc.Prelude
   build-depends:
     base >=4.13 && <5,
-    deepseq >=1.4 && <1.5,
-    semigroupoids >=5.3 && <6
+    deepseq >=1.4 && <2,
+    semigroupoids >=5.3 && <7
 
 benchmark bench
   type: exitcode-stdio-1.0
