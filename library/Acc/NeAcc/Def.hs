@@ -21,11 +21,11 @@ data NeAcc a
   = Leaf a
   | Branch !(NeAcc a) !(NeAcc a)
 
-instance Show a => Show (NeAcc a) where
+instance (Show a) => Show (NeAcc a) where
   show =
     show . toList
 
-instance NFData a => NFData (NeAcc a) where
+instance (NFData a) => NFData (NeAcc a) where
   rnf = \case
     Leaf a -> rnf a
     Branch l r -> seq (rnf l) (rnf r)
@@ -120,7 +120,7 @@ instance Foldable NeAcc where
           _ -> step acc leaf
 
   {-# INLINE [0] foldMap #-}
-  foldMap :: Monoid m => (a -> m) -> NeAcc a -> m
+  foldMap :: (Monoid m) => (a -> m) -> NeAcc a -> m
   foldMap map =
     peel
     where
@@ -138,16 +138,16 @@ instance Foldable NeAcc where
             map a <> peel buff
 
   {-# INLINE [0] foldMap' #-}
-  foldMap' :: Monoid m => (a -> m) -> NeAcc a -> m
+  foldMap' :: (Monoid m) => (a -> m) -> NeAcc a -> m
   foldMap' =
     foldMapTo' mempty
     where
-      foldMapTo' :: Monoid m => m -> (a -> m) -> NeAcc a -> m
+      foldMapTo' :: (Monoid m) => m -> (a -> m) -> NeAcc a -> m
       foldMapTo' !acc map =
         \case
           Branch a b -> foldMapToOnBranch' acc map a b
           Leaf a -> acc <> map a
-      foldMapToOnBranch' :: Monoid m => m -> (a -> m) -> NeAcc a -> NeAcc a -> m
+      foldMapToOnBranch' :: (Monoid m) => m -> (a -> m) -> NeAcc a -> NeAcc a -> m
       foldMapToOnBranch' acc map a b =
         case a of
           Leaf c -> foldMapTo' (acc <> map c) map b
@@ -155,7 +155,7 @@ instance Foldable NeAcc where
 
 instance Traversable NeAcc where
   {-# INLINE [0] traverse #-}
-  traverse :: Applicative f => (a -> f b) -> NeAcc a -> f (NeAcc b)
+  traverse :: (Applicative f) => (a -> f b) -> NeAcc a -> f (NeAcc b)
   traverse map =
     \case
       Branch a b ->
@@ -163,7 +163,7 @@ instance Traversable NeAcc where
       Leaf a ->
         Leaf <$> map a
     where
-      traverseOnBranch :: Applicative f => (a -> f b) -> NeAcc a -> NeAcc a -> f (NeAcc b)
+      traverseOnBranch :: (Applicative f) => (a -> f b) -> NeAcc a -> NeAcc a -> f (NeAcc b)
       traverseOnBranch map a b =
         case a of
           Leaf c ->
@@ -173,7 +173,7 @@ instance Traversable NeAcc where
 
 instance Foldable1 NeAcc where
   {-# INLINE [0] fold1 #-}
-  fold1 :: Semigroup m => NeAcc m -> m
+  fold1 :: (Semigroup m) => NeAcc m -> m
   fold1 =
     \case
       Branch l r ->
@@ -182,7 +182,7 @@ instance Foldable1 NeAcc where
         a
 
   {-# INLINE [0] foldMap1 #-}
-  foldMap1 :: Semigroup m => (a -> m) -> NeAcc a -> m
+  foldMap1 :: (Semigroup m) => (a -> m) -> NeAcc a -> m
   foldMap1 f =
     \case
       Branch l r ->
@@ -243,13 +243,13 @@ rebalancingLeft l r cont =
     Leaf a ->
       cont a r
 
-foldM :: Monad m => (a -> b -> m a) -> a -> NeAcc b -> m a
+foldM :: (Monad m) => (a -> b -> m a) -> a -> NeAcc b -> m a
 foldM step !acc =
   \case
     Branch a b -> foldMOnBranch step acc a b
     Leaf a -> step acc a
   where
-    foldMOnBranch :: Monad m => (a -> b -> m a) -> a -> NeAcc b -> NeAcc b -> m a
+    foldMOnBranch :: (Monad m) => (a -> b -> m a) -> a -> NeAcc b -> NeAcc b -> m a
     foldMOnBranch step acc a b =
       case a of
         Leaf c -> step acc c >>= \acc' -> foldM step acc' b

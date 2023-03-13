@@ -55,7 +55,7 @@ main =
               === NonEmpty.nonEmpty (toList acc)
       ]
 
-instance Arbitrary a => Arbitrary (Acc a) where
+instance (Arbitrary a) => Arbitrary (Acc a) where
   arbitrary =
     accGen arbitrary
 

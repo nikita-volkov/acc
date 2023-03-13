@@ -43,7 +43,7 @@ data Acc a
   = EmptyAcc
   | TreeAcc !(NeAcc.NeAcc a)
 
-instance NFData a => NFData (Acc a) where
+instance (NFData a) => NFData (Acc a) where
   rnf = \case
     TreeAcc tree -> rnf tree
     EmptyAcc -> ()
@@ -165,7 +165,7 @@ instance IsList (Acc a) where
       _ ->
         []
 
-instance Show a => Show (Acc a) where
+instance (Show a) => Show (Acc a) where
   show =
     show . toList
 
