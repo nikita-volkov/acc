@@ -1,10 +1,10 @@
 module Main where
 
 import qualified Acc
-import qualified Data.DList as DList
-import qualified Data.Sequence as Sequence
 import Criterion
 import Criterion.Main
+import qualified Data.DList as DList
+import qualified Data.Sequence as Sequence
 import Prelude
 
 main :: IO ()
