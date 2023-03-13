@@ -4,4 +4,3 @@ module Acc.NeAcc
 where
 
 import Acc.NeAcc.Def
-import Acc.Prelude

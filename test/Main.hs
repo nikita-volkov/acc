@@ -1,16 +1,14 @@
+{-# OPTIONS_GHC -Wno-orphans #-}
 module Main where
 
 import Acc
 import qualified Data.List.NonEmpty as NonEmpty
-import GHC.Exts (fromList)
-import qualified Test.QuickCheck as QuickCheck
-import Test.QuickCheck.Instances
+import Test.QuickCheck.Instances ()
 import Test.Tasty
-import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
-import Test.Tasty.Runners
 import Prelude hiding (assert)
 
+main :: IO ()
 main =
   defaultMain $
     testGroup

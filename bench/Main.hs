@@ -2,13 +2,12 @@ module Main where
 
 import qualified Acc
 import qualified Data.DList as DList
-import qualified Data.Foldable as Foldable
 import qualified Data.Sequence as Sequence
-import qualified Data.Vector as Vector
-import Gauge
-import Gauge.Main
+import Criterion
+import Criterion.Main
 import Prelude
 
+main :: IO ()
 main =
   defaultMain
     [ bgroup "sum" $
@@ -148,4 +147,4 @@ onSizeByMagBenchList amount benchmarks =
   take amount sizesByMagnitude <&> \size -> bgroup (show size) (benchmarks size)
 
 sizesByMagnitude :: [Int]
-sizesByMagnitude = [0 ..] <&> \magnitude -> 10 ^ magnitude
+sizesByMagnitude = [0 :: Int ..] <&> \magnitude -> 10 ^ magnitude

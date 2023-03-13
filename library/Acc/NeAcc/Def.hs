@@ -11,7 +11,6 @@ module Acc.NeAcc.Def
 where
 
 import Acc.Prelude hiding (foldM)
-import qualified Acc.Prelude as Prelude
 
 -- |
 -- Non-empty accumulator.
