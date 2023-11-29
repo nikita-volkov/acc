@@ -10,7 +10,7 @@ module Acc.NeAcc.Def
   )
 where
 
-import Acc.Prelude hiding (foldM)
+import Acc.Prelude hiding (foldM, unsnoc)
 
 -- |
 -- Non-empty accumulator.

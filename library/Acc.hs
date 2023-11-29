@@ -13,7 +13,7 @@ where
 
 import qualified Acc.NeAcc as NeAcc
 import qualified Acc.NeAcc.Def as NeAcc
-import Acc.Prelude hiding (enumFromTo, toNonEmpty)
+import Acc.Prelude hiding (enumFromTo, toNonEmpty, unsnoc)
 import qualified Data.Semigroup.Foldable as Foldable1
 
 -- |
