@@ -10,62 +10,64 @@ import Prelude
 main :: IO ()
 main =
   defaultMain
-    [ bgroup "sum" $
-        [ onIntListByMagBench "cons" 4 $ \input ->
-            [ reduceConstructBench "acc" input sum $
-                foldl' (flip Acc.cons) mempty,
-              reduceConstructBench "list" input sum $
-                foldl' (flip (:)) [],
-              reduceConstructBench "dlist" input sum $
-                foldl' (flip DList.cons) mempty,
-              reduceConstructBench "sequence" input sum $
-                foldl' (flip (Sequence.<|)) mempty
-            ],
-          onIntListByMagBench "snoc" 4 $ \input ->
-            [ reduceConstructBench "acc" input sum $
-                foldl' (flip Acc.snoc) mempty,
-              reduceConstructBench "dlist" input sum $
-                foldl' DList.snoc mempty,
-              reduceConstructBench "sequence" input sum $
-                foldl' (Sequence.|>) mempty
-            ],
-          onIntListByMagBench "fromList" 4 $ \input ->
-            [ reduceConstructBench "acc" input sum $ fromList @(Acc.Acc Int),
-              reduceConstructBench "list" input sum $ id,
-              reduceConstructBench "dlist" input sum $ DList.fromList,
-              reduceConstructBench "sequence" input sum $ Sequence.fromList
-            ],
-          bgroup "append" $
-            [ bgroup "left" $
-                onIntListByMagBenchList 4 $ \input ->
-                  onSizeByMagBenchList 4 $ \appendAmount ->
-                    [ appendLeftBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
-                      appendLeftBench "list" appendAmount input sum,
-                      appendLeftBench "dlist" appendAmount (DList.fromList input) sum,
-                      appendLeftBench "sequence" appendAmount (Sequence.fromList input) sum
-                    ],
-              bgroup "right" $
-                onIntListByMagBenchList 4 $ \input ->
-                  onSizeByMagBenchList 4 $ \appendAmount ->
-                    [ appendRightBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
-                      appendRightBench "list" appendAmount input sum,
-                      appendRightBench "dlist" appendAmount (DList.fromList input) sum,
-                      appendRightBench "sequence" appendAmount (Sequence.fromList input) sum
-                    ]
-            ]
-        ],
-      bgroup "length" $
-        [ onIntListByMagBench "cons" 4 $ \input ->
-            [ reduceConstructBench "acc" input length $
-                foldl' (flip Acc.cons) mempty,
-              reduceConstructBench "list" input length $
-                foldl' (flip (:)) [],
-              reduceConstructBench "dlist" input length $
-                foldl' (flip DList.cons) mempty,
-              reduceConstructBench "sequence" input length $
-                foldl' (flip (Sequence.<|)) mempty
-            ]
-        ]
+    [ bgroup "sum"
+        $ [ onIntListByMagBench "cons" 4 $ \input ->
+              [ reduceConstructBench "acc" input sum
+                  $ foldl' (flip Acc.cons) mempty,
+                reduceConstructBench "list" input sum
+                  $ foldl' (flip (:)) [],
+                reduceConstructBench "dlist" input sum
+                  $ foldl' (flip DList.cons) mempty,
+                reduceConstructBench "sequence" input sum
+                  $ foldl' (flip (Sequence.<|)) mempty
+              ],
+            onIntListByMagBench "snoc" 4 $ \input ->
+              [ reduceConstructBench "acc" input sum
+                  $ foldl' (flip Acc.snoc) mempty,
+                reduceConstructBench "dlist" input sum
+                  $ foldl' DList.snoc mempty,
+                reduceConstructBench "sequence" input sum
+                  $ foldl' (Sequence.|>) mempty
+              ],
+            onIntListByMagBench "fromList" 4 $ \input ->
+              [ reduceConstructBench "acc" input sum $ fromList @(Acc.Acc Int),
+                reduceConstructBench "list" input sum $ id,
+                reduceConstructBench "dlist" input sum $ DList.fromList,
+                reduceConstructBench "sequence" input sum $ Sequence.fromList
+              ],
+            bgroup "append"
+              $ [ bgroup "left"
+                    $ onIntListByMagBenchList 4
+                    $ \input ->
+                      onSizeByMagBenchList 4 $ \appendAmount ->
+                        [ appendLeftBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
+                          appendLeftBench "list" appendAmount input sum,
+                          appendLeftBench "dlist" appendAmount (DList.fromList input) sum,
+                          appendLeftBench "sequence" appendAmount (Sequence.fromList input) sum
+                        ],
+                  bgroup "right"
+                    $ onIntListByMagBenchList 4
+                    $ \input ->
+                      onSizeByMagBenchList 4 $ \appendAmount ->
+                        [ appendRightBench "acc" appendAmount (fromList @(Acc.Acc Int) input) sum,
+                          appendRightBench "list" appendAmount input sum,
+                          appendRightBench "dlist" appendAmount (DList.fromList input) sum,
+                          appendRightBench "sequence" appendAmount (Sequence.fromList input) sum
+                        ]
+                ]
+          ],
+      bgroup "length"
+        $ [ onIntListByMagBench "cons" 4 $ \input ->
+              [ reduceConstructBench "acc" input length
+                  $ foldl' (flip Acc.cons) mempty,
+                reduceConstructBench "list" input length
+                  $ foldl' (flip (:)) [],
+                reduceConstructBench "dlist" input length
+                  $ foldl' (flip DList.cons) mempty,
+                reduceConstructBench "sequence" input length
+                  $ foldl' (flip (Sequence.<|)) mempty
+              ]
+          ]
     ]
 
 -- |
@@ -104,8 +106,8 @@ appendLeftBench ::
 appendLeftBench name appendAmount chunk reducer =
   let input =
         replicate appendAmount chunk
-   in reduceConstructBench name input reducer $
-        foldl' (flip (<>)) mempty
+   in reduceConstructBench name input reducer
+        $ foldl' (flip (<>)) mempty
 
 -- |
 -- Construct a benchmark that measures appending from the right side of a
@@ -125,8 +127,8 @@ appendRightBench ::
 appendRightBench name appendAmount chunk reducer =
   let input =
         replicate appendAmount chunk
-   in reduceConstructBench name input reducer $
-        foldl' (<>) mempty
+   in reduceConstructBench name input reducer
+        $ foldl' (<>) mempty
 
 onIntListByMagBench :: String -> Int -> ([Int] -> [Benchmark]) -> Benchmark
 onIntListByMagBench groupName amount benchmarks =
