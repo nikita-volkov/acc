@@ -11,11 +11,11 @@ import Prelude hiding (assert)
 
 main :: IO ()
 main =
-  defaultMain $
-    testGroup
+  defaultMain
+    $ testGroup
       "All tests"
-      [ testProperty "Acc converted to list and reconstructed from it converts to the same list again" $
-          \(acc :: Acc Int) ->
+      [ testProperty "Acc converted to list and reconstructed from it converts to the same list again"
+          $ \(acc :: Acc Int) ->
             let list =
                   toList acc
                 acc' :: Acc Int
@@ -24,32 +24,32 @@ main =
                 list' =
                   toList acc'
              in list === list',
-        testProperty "foldl" $
-          \(acc :: Acc Int) ->
+        testProperty "foldl"
+          $ \(acc :: Acc Int) ->
             foldl (flip (:)) [] acc
               === foldl (flip (:)) [] (toList acc),
-        testProperty "foldl'" $
-          \(acc :: Acc Int) ->
+        testProperty "foldl'"
+          $ \(acc :: Acc Int) ->
             foldl' (flip (:)) [] acc
               === foldl' (flip (:)) [] (toList acc),
-        testProperty "foldr" $
-          \(acc :: Acc Int) ->
+        testProperty "foldr"
+          $ \(acc :: Acc Int) ->
             foldr (:) [] acc
               === foldr (:) [] (toList acc),
-        testProperty "foldr'" $
-          \(acc :: Acc Int) ->
+        testProperty "foldr'"
+          $ \(acc :: Acc Int) ->
             foldr' (:) [] acc
               === foldr' (:) [] (toList acc),
-        testProperty "foldMap" $
-          \(acc :: Acc Int) ->
+        testProperty "foldMap"
+          $ \(acc :: Acc Int) ->
             foldMap (: []) acc
               === foldMap (: []) (toList acc),
-        testProperty "foldMap'" $
-          \(acc :: Acc Int) ->
+        testProperty "foldMap'"
+          $ \(acc :: Acc Int) ->
             foldMap' (: []) acc
               === foldMap' (: []) (toList acc),
-        testProperty "toNonEmpty" $
-          \(acc :: Acc Int) ->
+        testProperty "toNonEmpty"
+          $ \(acc :: Acc Int) ->
             Acc.toNonEmpty acc
               === NonEmpty.nonEmpty (toList acc)
       ]
