@@ -51,7 +51,14 @@ main =
         testProperty "toNonEmpty"
           $ \(acc :: Acc Int) ->
             Acc.toNonEmpty acc
-              === NonEmpty.nonEmpty (toList acc)
+              === NonEmpty.nonEmpty (toList acc),
+        testProperty "snoccing an unsnocced element of an acc produces the same acc"
+          $ \(acc :: Acc Int) ->
+            case Acc.unsnoc acc of
+              Just (lastElement, prefix) ->
+                toList (Acc.snoc lastElement prefix) === toList acc
+              Nothing ->
+                discard
       ]
 
 instance (Arbitrary a) => Arbitrary (Acc a) where
