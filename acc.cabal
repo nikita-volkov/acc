@@ -189,4 +189,5 @@ test-suite test
     , quickcheck-instances >=0.3.11 && <0.4
     , rerebase >=1.9 && <2
     , tasty >=0.12 && <2
+    , tasty-hunit ^>=0.10
     , tasty-quickcheck >=0.9 && <0.11
