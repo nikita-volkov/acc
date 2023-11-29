@@ -1,6 +1,6 @@
 cabal-version:      3.0
 name:               acc
-version:            0.2.0.1
+version:            0.2.0.2
 synopsis:           Sequence optimized for monoidal construction and folding
 description:
   Data structure intended for accumulating a sequence of elements
