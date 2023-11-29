@@ -290,7 +290,7 @@ unsnocTo :: NeAcc a -> NeAcc a -> (a, NeAcc a)
 unsnocTo buff =
   \case
     Branch l r ->
-      unsnocTo (Branch l buff) r
+      unsnocTo (Branch buff l) r
     Leaf a ->
       (a, buff)
 
