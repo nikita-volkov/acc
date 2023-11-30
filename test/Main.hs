@@ -53,11 +53,18 @@ main =
           $ \(acc :: Acc Int) ->
             Acc.toNonEmpty acc
               === NonEmpty.nonEmpty (toList acc),
-        testProperty "snoccing an unsnocced element of an acc produces the same acc"
+        testProperty "Snoccing an unsnocced element of an acc produces the same acc"
           $ \(acc :: Acc Int) ->
             case Acc.unsnoc acc of
               Just (lastElement, prefix) ->
                 toList (Acc.snoc lastElement prefix) === toList acc
+              Nothing ->
+                discard,
+        testProperty "Consing an unconsed element of an acc produces the same acc"
+          $ \(acc :: Acc Int) ->
+            case Acc.uncons acc of
+              Just (firstElement, suffix) ->
+                toList (Acc.cons firstElement suffix) === toList acc
               Nothing ->
                 discard,
         testGroup "Issue #10"
