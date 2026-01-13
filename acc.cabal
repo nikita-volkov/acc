@@ -186,7 +186,7 @@ test-suite test
   main-is:            Main.hs
   build-depends:
     , acc
-    , quickcheck-instances >=0.3.11 && <0.4
+    , quickcheck-instances >=0.3.11 && <0.5
     , rerebase >=1.9 && <2
     , tasty >=0.12 && <2
     , tasty-hunit ^>=0.10
