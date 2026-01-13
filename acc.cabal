@@ -1,6 +1,6 @@
 cabal-version:      3.0
 name:               acc
-version:            0.2.0.3
+version:            0.2.0.4
 synopsis:           Sequence optimized for monoidal construction and folding
 description:
   Data structure intended for accumulating a sequence of elements
@@ -186,7 +186,7 @@ test-suite test
   main-is:            Main.hs
   build-depends:
     , acc
-    , quickcheck-instances >=0.3.11 && <0.4
+    , quickcheck-instances >=0.3.11 && <0.5
     , rerebase >=1.9 && <2
     , tasty >=0.12 && <2
     , tasty-hunit ^>=0.10
